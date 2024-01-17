@@ -4,6 +4,7 @@ import 'package:ev_charging_stations/features/screens/profile/profile.dart';
 import 'package:ev_charging_stations/features/screens/station_finder/station_finder.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class GridDashboard extends StatelessWidget {
   Items item1 = Items(
     title: "Profile",

@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:ev_charging_stations/features/station/stationList.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +11,7 @@ class MapScreen extends StatefulWidget {
   const MapScreen({Key? key, required this.stationID}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _MapScreenState createState() => _MapScreenState();
 
   Station fetchStationDetails(int stationID) {

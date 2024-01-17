@@ -1,10 +1,4 @@
-import 'package:ev_charging_stations/features/screens/map_screen/map_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:ev_charging_stations/features/screens/bookings/booking_details.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class BookingDetailsScreen extends StatelessWidget {
    const BookingDetailsScreen({Key? key}) : super(key: key);
