@@ -1,18 +1,71 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ev_charging_stations/features/screens/signup/signup.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
-class UserProfilePage extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+class UserProfilePage extends StatefulWidget {
+  const UserProfilePage({super.key});
+
+  @override
+  _UserProfilePageState createState() => _UserProfilePageState();
+}
+
+class _UserProfilePageState extends State<UserProfilePage> {
+  final user = FirebaseAuth.instance.currentUser!;
+  final db = FirebaseFirestore.instance;
+
+  late TextEditingController nameController;
+  late TextEditingController mobileController;
+  late TextEditingController ageController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    nameController = TextEditingController();
+    mobileController = TextEditingController();
+    ageController = TextEditingController();
+
+    // Fetch user data from Firestore
+    fetchUserData();
+  }
+
+  void fetchUserData() async {
+  try {
+    final docRef = db.collection("users").doc(user.email!);
+    DocumentSnapshot doc = await docRef.get();
+
+    if (doc.exists) {
+      // If document exists, update text controllers with data
+      final userData = doc.data() as Map<String, dynamic>;
+      nameController.text = userData['name'] ?? '';
+      mobileController.text = userData['mobile'] ?? '';
+      ageController.text = userData['age'] ?? '';
+
+      // Print the user data for debugging purposes
+      print("User Data: $userData");
+    } else {
+      print("Document does not exist");
+    }
+  } catch (e) {
+    print("Error getting document: $e");
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 0, 0, 0),
+        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: const Color.fromARGB(255, 255, 255, 255)),
+          icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 255, 255, 255)),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -25,7 +78,6 @@ class UserProfilePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 110),
               const Text(
                 "Manage Your User Profile here.",
                 style: TextStyle(
@@ -34,32 +86,41 @@ class UserProfilePage extends StatelessWidget {
                   color: Color.fromARGB(255, 26, 26, 26),
                 ),
               ),
-              SizedBox(height: 20),
-              buildProfileTextField("First Name", Icons.person),
-              buildProfileTextField("Last Name", Icons.person),
-              buildProfileTextField("Username", Icons.verified_user),
-              buildProfileTextField("Email", Icons.mail_outline_rounded),
-              buildProfileTextField("Location", Icons.location_on),
-              buildProfileTextField("Password", Icons.lock),
-              SizedBox(height: 24),
+              Text(
+                user.email!,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black54,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 20),
+              buildProfileTextField("Name", Icons.person, nameController),
+              buildProfileTextField("Mobile", Icons.call, mobileController),
+              buildProfileTextField("Age", Icons.handshake, ageController),
+              const SizedBox(height: 24),
               SizedBox(
                 height: 50,
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => Get.to(() => const SignupScreen()),
+                  onPressed: () {
+                    updateProfile(); // Add the currently entered vehicle
+                    // Navigate or perform additional actions if needed
+                  },
                   style: ElevatedButton.styleFrom(
-                    primary: const Color.fromARGB(255, 22, 22, 22),
-                    side: BorderSide(color: const Color.fromARGB(255, 20, 20, 20)),
+                    backgroundColor: const Color.fromARGB(255, 22, 22, 22),
+                    side: const BorderSide(color: Color.fromARGB(255, 20, 20, 20)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   child: const Text(
-                    "Update Profile",
+                    "Update",
                     style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 228, 228, 228)),
                   ),
                 ),
               ),
+              
             ],
           ),
         ),
@@ -67,10 +128,11 @@ class UserProfilePage extends StatelessWidget {
     );
   }
 
-  Widget buildProfileTextField(String label, IconData prefixIcon) {
+  Widget buildProfileTextField(String label, IconData prefixIcon, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
+        controller: controller,
         decoration: InputDecoration(
           prefixIcon: Icon(prefixIcon),
           labelText: label,
@@ -80,5 +142,34 @@ class UserProfilePage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void updateProfile() async {
+    try {
+      final docRef = db.collection("users").doc(user.email!);
+      
+      // Check if the document exists
+      DocumentSnapshot doc = await docRef.get();
+
+      if (doc.exists) {
+        // If the document exists, update the fields
+        await docRef.update({
+          'name': nameController.text,
+          'mobile': mobileController.text,
+          'age': ageController.text,
+        });
+        print("Profile updated successfully!");
+      } else {
+        // If the document does not exist, create a new one
+        await docRef.set({
+          'name': nameController.text,
+          'mobile': mobileController.text,
+          'age': ageController.text,
+        });
+        print("New profile created successfully!");
+      }
+    } catch (e) {
+      print("Error updating profile: $e");
+    }
   }
 }

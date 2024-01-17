@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "919162595868",
+    "project_id": "flutterevstationapp",
+    "storage_bucket": "flutterevstationapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:919162595868:android:94108372e93baa67e40dd9",
+        "android_client_info": {
+          "package_name": "com.example.ev_charging_stations"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYrn0s8dhLthWs-jVO5vDoXV2RSlg3EJQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,8 +1,18 @@
 import 'package:ev_charging_stations/features/screens/home/grid_dashboard.dart';
+import 'package:ev_charging_stations/features/screens/login/login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+
+  final user = FirebaseAuth.instance.currentUser!;
+
+  void userSignOut() {
+    FirebaseAuth.instance.signOut();
+    Get.offAll(() => LoginScreen());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,25 +27,25 @@ class HomeScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       "EV - Charge Connect",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 4,
                     ),
                     Text(
-                      "Locate and Plan Your EV Charge!",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.black45,
-                        fontWeight: FontWeight.bold,
+                      user.email!,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black54,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
@@ -43,9 +53,9 @@ class HomeScreen extends StatelessWidget {
 
                 // Buttons on homescreen
                 IconButton(
-                  onPressed: () {}, 
+                  onPressed: userSignOut, 
                   alignment: Alignment.topCenter,
-                  icon: const Icon(Icons.home)
+                  icon: const Icon(Icons.logout)
                 ),
               ],
             ),

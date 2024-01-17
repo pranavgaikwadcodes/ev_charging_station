@@ -1,11 +1,15 @@
+import 'package:ev_charging_stations/features/controller/AuthController.dart';
 import 'package:ev_charging_stations/features/screens/login/login.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SignupScreen extends StatelessWidget {
   const SignupScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    AuthController authController = Get.put(AuthController());
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Sign Up"),
@@ -34,36 +38,13 @@ class SignupScreen extends StatelessWidget {
               Form(
                 child: Column(
                   children: [
-                    // First Name
+                    // Name
                     TextFormField(
+                      controller: authController.nameController,
                       style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
-                        labelText: "First Name",
-                        prefixIcon: const Icon(Icons.person),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    // Last Name
-                    TextFormField(
-                      style: const TextStyle(color: Colors.black),
-                      decoration: InputDecoration(
-                        labelText: "Last Name",
-                        prefixIcon: const Icon(Icons.person),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    // Username
-                    TextFormField(
-                      style: const TextStyle(color: Colors.black),
-                      decoration: InputDecoration(
-                        labelText: "Username",
-                        prefixIcon: const Icon(Icons.verified_user),
+                        labelText: "Name",
+                        prefixIcon: const Icon(Icons.mail_rounded),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -72,6 +53,7 @@ class SignupScreen extends StatelessWidget {
                     const SizedBox(height: 15),
                     // Email
                     TextFormField(
+                      controller: authController.emailController,
                       style: const TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         labelText: "Email",
@@ -82,48 +64,47 @@ class SignupScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 15),
+                    
                     // Password
-                    TextFormField(
+                    Obx(() => TextFormField(
+                      controller: authController.passwordController,
                       style: const TextStyle(color: Colors.black),
+                      obscureText: authController.hidePassword.value,
                       decoration: InputDecoration(
                         labelText: "Password",
                         prefixIcon: const Icon(Icons.lock),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    // Confirm Password
-                    TextFormField(
-                      obscureText: true,
-                      style: const TextStyle(color: Colors.black),
-                      decoration: InputDecoration(
-                        labelText: "Confirm Password",
-                        prefixIcon: const Icon(Icons.lock),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+
+                        suffixIcon: IconButton(
+                          onPressed: () => authController.hidePassword.value = !authController.hidePassword.value,
+                          icon: const Icon(Icons.remove_red_eye_outlined),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 30),
+                    ),),
+
+                    const SizedBox(height: 15),
+                    
                     // Signup Button
                     SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () {},
+                      child: 
+                      Obx(() => authController.isLoading.value ? const CircularProgressIndicator() : ElevatedButton(
+                        onPressed: () {
+                          authController.signupWithEmailAndPwd();
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
+                          padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                         ),
                         child: const Text(
                           "Create Account",
                           style: TextStyle(fontSize: 20),
                         ),
-                      ),
+                      ),)
                     ),
 
                     const SizedBox(height: 15),

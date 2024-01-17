@@ -1,5 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class ManageVehiclesScreen extends StatefulWidget {
   const ManageVehiclesScreen({Key? key}) : super(key: key);
@@ -10,7 +11,118 @@ class ManageVehiclesScreen extends StatefulWidget {
 
 class _ManageVehiclesScreenState extends State<ManageVehiclesScreen> {
   String selectedVehicleType = '2 Wheeler';
-  List<String> addedVehicles = ['Car Model X', 'Scooter A']; // List to store currently added vehicles
+  List<String> addedVehicles = []; // List to store currently added vehicles as strings
+  TextEditingController _brandController = TextEditingController();
+  TextEditingController _vehicleNameController = TextEditingController();
+  final user = FirebaseAuth.instance.currentUser!;
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch and display the existing vehicles when the screen is initialized
+    _fetchVehicles();
+  }
+
+  Future<void> _fetchVehicles() async {
+    try {
+      // Get the reference to the user's document
+      DocumentSnapshot userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(user.email!).get();
+
+      // Get the 'vehicles' field from the document
+      List<dynamic> vehicles = userDoc['vehicles'] ?? [];
+
+      setState(() {
+        // Update the addedVehicles list with the fetched vehicles
+        addedVehicles = List<String>.from(vehicles.map((vehicle) {
+          if (vehicle is Map<String, dynamic> && vehicle.isNotEmpty) {
+            return '${vehicle['name']} - ${vehicle['brand']} (${vehicle['type']})';
+          } else {
+            return ''; // Replace with your default value or handle the case as needed
+          }
+        }));
+      });
+    } catch (e) {
+      print('Error fetching vehicles from Firestore: $e');
+      // Handle the error as needed
+    }
+  }
+
+  Future<void> _addVehicle() async {
+    try {
+      // Get the reference to the user's document
+      DocumentReference userDocRef =
+          FirebaseFirestore.instance.collection('users').doc(user.email!);
+
+      // Get the currently entered vehicle details
+      String vehicleName = _vehicleNameController.text;
+      String brand = _brandController.text;
+      String selectedType = selectedVehicleType;
+
+      // Update Firestore with the new vehicle
+      await userDocRef.update({
+        'vehicles': FieldValue.arrayUnion([
+          {
+            'name': vehicleName,
+            'brand': brand,
+            'type': selectedType,
+          }
+        ]),
+      });
+
+      // Clear the text fields after adding the vehicle
+      _vehicleNameController.clear();
+      _brandController.clear();
+
+      // Fetch and display the updated list of vehicles
+      await _fetchVehicles();
+
+      print('Vehicle updated successfully in Firestore');
+    } catch (e) {
+      print('Error updating vehicle in Firestore: $e');
+      // Handle the error as needed
+    }
+  }
+
+void _deleteVehicle(String vehicle) {
+  int index = addedVehicles.indexOf(vehicle);
+  if (index != -1) {
+    setState(() {
+      addedVehicles.removeAt(index);
+    });
+    // Now you can also update Firestore to remove the deleted vehicle if needed
+    _updateFirestoreAfterDelete(index);
+  }
+}
+
+Future<void> _updateFirestoreAfterDelete(int deletedIndex) async {
+  try {
+    // Get the reference to the user's document
+    DocumentReference userDocRef =
+        FirebaseFirestore.instance.collection('users').doc(user.email!);
+
+    // Fetch the current list of vehicles
+    DocumentSnapshot<Object?> userDoc = await userDocRef.get();
+    
+    // Cast to the correct type
+    Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>? ?? {};
+    List<dynamic> currentVehicles = data['vehicles'] ?? [];
+
+    // Remove the deleted vehicle from Firestore
+    currentVehicles.removeAt(deletedIndex);
+
+    // Update Firestore with the modified list
+    await userDocRef.update({'vehicles': currentVehicles});
+
+    print('Vehicle deleted successfully in Firestore');
+  } catch (e) {
+    print('Error deleting vehicle in Firestore: $e');
+    // Handle the error as needed
+  }
+}
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -43,17 +155,16 @@ class _ManageVehiclesScreenState extends State<ManageVehiclesScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              buildProfileTextField("Vehicle Name", Icons.car_repair),
-              buildProfileTextField("Brand", Icons.person),
+              buildProfileTextField("Vehicle Name", Icons.car_repair, _vehicleNameController),
+              buildProfileTextField("Brand", Icons.person, _brandController),
               buildDropdownField(),
               const SizedBox(height: 24),
               SizedBox(
                 height: 50,
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    _addVehicle(); // Add the currently entered vehicle
-                    // Navigate or perform additional actions if needed
+                  onPressed: () async {
+                    await _addVehicle();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 22, 22, 22),
@@ -68,7 +179,11 @@ class _ManageVehiclesScreenState extends State<ManageVehiclesScreen> {
                   ),
                 ),
               ),
-              const Divider(), // Divider after "Add Vehicle" button
+              const SizedBox(height: 10),
+              const Divider(
+                color: Color.fromARGB(255, 0, 0, 0),
+                thickness: 1,
+              ), // Divider after "Add Vehicle" button
               const SizedBox(height: 16),
               const Text(
                 "Currently Added Vehicles",
@@ -78,6 +193,7 @@ class _ManageVehiclesScreenState extends State<ManageVehiclesScreen> {
                   color: Color.fromARGB(255, 26, 26, 26),
                 ),
               ),
+              const SizedBox(height: 16),
               ..._buildAddedVehiclesList(), // List of currently added vehicles
             ],
           ),
@@ -86,10 +202,11 @@ class _ManageVehiclesScreenState extends State<ManageVehiclesScreen> {
     );
   }
 
-  Widget buildProfileTextField(String label, IconData prefixIcon) {
+  Widget buildProfileTextField(String label, IconData prefixIcon, TextEditingController _controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
+        controller: _controller,
         decoration: InputDecoration(
           prefixIcon: Icon(prefixIcon),
           labelText: label,
@@ -133,13 +250,19 @@ class _ManageVehiclesScreenState extends State<ManageVehiclesScreen> {
     return vehicleType == '2 Wheeler' ? Icons.motorcycle : Icons.directions_car;
   }
 
-  void _addVehicle() {
-    // Get the currently entered vehicle name and add it to the list
-    final TextEditingController vehicleNameController = TextEditingController();
-    addedVehicles.add(vehicleNameController.text);
+  List<ListTile> _buildAddedVehiclesList() {
+    return addedVehicles.map((vehicle) => ListTile(
+      title: Text(vehicle),
+      trailing: IconButton(
+        icon: Icon(Icons.delete),
+        onPressed: () {
+          _deleteVehicle(vehicle);
+          print(vehicle);
+        },
+      ),
+    )).toList();
   }
 
-  List<Widget> _buildAddedVehiclesList() {
-    return addedVehicles.map((vehicle) => ListTile(title: Text(vehicle))).toList();
-  }
+  
+
 }

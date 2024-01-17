@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyCnQ-w3_b5LD9-UzPHWttl8nGYQPSWVAm4</string>
+	<key>GCM_SENDER_ID</key>
+	<string>919162595868</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.evChargingStations.RunnerTests</string>
+	<key>PROJECT_ID</key>
+	<string>flutterevstationapp</string>
+	<key>STORAGE_BUCKET</key>
+	<string>flutterevstationapp.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:919162595868:ios:679387f3ef8dc36ce40dd9</string>
+</dict>
+</plist>

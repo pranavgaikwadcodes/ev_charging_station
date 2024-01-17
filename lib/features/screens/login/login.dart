@@ -1,19 +1,104 @@
+import 'package:ev_charging_stations/features/controller/AuthController.dart';
 import 'package:ev_charging_stations/features/screens/home/home.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:ev_charging_stations/features/screens/signup/signup.dart';
 
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+
+
+
+
+class LoginController extends GetxController {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final hidePassword = true.obs;
+  final isLoading = false.obs;
+  final errorText = ''.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    checkUserLoggedIn();
+  }
+
+  void checkUserLoggedIn() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    User? user = auth.currentUser;
+
+    if (user != null) {
+      // User is already logged in
+      print("User is already logged in: ${user.uid}");
+      // Defer navigation until after the frame is built
+      WidgetsBinding.instance?.addPostFrameCallback((_) {
+        Get.offAll(() => HomeScreen());
+      });
+    } else {
+      // User is not logged in
+      print("User is not logged in");
+    }
+  }
+
+  void togglePasswordVisibility() {
+    hidePassword.value = !hidePassword.value;
+  }
+
+  void signIn() async {
+    isLoading.value = true;
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
+      Get.offAll(() => HomeScreen());
+      print("Logged in");
+    } catch (e) {
+      print("Error: $e");
+
+      if (e is FirebaseAuthException) {
+        if (e.code == 'invalid-email' || e.code == 'user-not-found') {
+          errorText.value = 'Incorrect email or password';
+        } else if (e.code == 'wrong-password') {
+          errorText.value = 'Incorrect password';
+        } else if (e.code == 'invalid-credential') {
+          errorText.value = 'Invalid credential. Please check your email and password.';
+        } else if (e.code == 'too-many-requests') {
+          errorText.value = 'Access to this account has been temporarily disabled due to many failed login attempts. Please reset your password or try again later.';
+        } else {
+          errorText.value = 'An error occurred during sign-in';
+        }
+      } else {
+        errorText.value = 'An unexpected error occurred';
+      }
+    } finally {
+      isLoading.value = false;
+    }
+  }
+}
+
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  LoginScreen({Key? key}) : super(key: key);
+
+  final LoginController loginController = Get.put(LoginController());
+
 
   @override
   Widget build(BuildContext context) {
+
+    AuthController authController = Get.put(AuthController());
+    
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(30),
-          
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -45,8 +130,9 @@ class LoginScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     TextFormField(
+                      controller: loginController.emailController,
                       decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.mail_outline_rounded),
+                        prefixIcon: const Icon(Icons.mail_outline_rounded),
                         labelText: "Email",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -54,52 +140,57 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 15),
-                    TextFormField(
-                      obscureText: true,
+                    Obx(() => TextFormField(
+                      controller: loginController.passwordController,
+                      obscureText: loginController.hidePassword.value,
                       decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.lock),
+                        prefixIcon: const Icon(Icons.lock),
                         labelText: "Password",
-                        suffixIcon: Icon(Icons.remove_red_eye),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
+                        suffixIcon: IconButton(
+                          onPressed: () => loginController.hidePassword.value = !loginController.hidePassword.value,
+                          icon: const Icon(Icons.remove_red_eye_outlined),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Checkbox(value: false, onChanged: (value) {}),
-                            const Text("Remember me"),
-                          ],
-                        ),
-                        TextButton(
-                          onPressed: () {},
-                          child: const Text(
-                            "Forgot Password",
-                            style: TextStyle(color: Colors.blue),
+                    ),),
+                    
+                    const SizedBox(height: 10),
+
+                    Obx(() => // Obx widget to observe changes in errorText
+                  loginController.errorText.value.isNotEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Text(
+                            loginController.errorText.value,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 16,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
+                        )
+                      : const SizedBox.shrink()),
+
+                    const SizedBox(height: 10),
                     SizedBox(
                       height: 50,
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () => Get.to( () => const HomeScreen()),
+                        onPressed: loginController.signIn,
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
+                          backgroundColor: Colors.blue,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: const Text(
-                          "Sign In",
-                          style: TextStyle(fontSize: 18),
-                        ),
+                        child: Obx(() => // Obx widget to observe changes in isLoading
+                            loginController.isLoading.value
+                                ? const CircularProgressIndicator(color: Colors.white,) // Show loading circle
+                                : const Text(
+                                    "Sign In",
+                                    style: TextStyle(fontSize: 18),
+                                  )),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -109,8 +200,8 @@ class LoginScreen extends StatelessWidget {
                       child: ElevatedButton(
                         onPressed: () => Get.to(() => const SignupScreen()),
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.white,
-                          side: BorderSide(color: Colors.blue),
+                          backgroundColor: Colors.white,
+                          side: const BorderSide(color: Colors.blue),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),

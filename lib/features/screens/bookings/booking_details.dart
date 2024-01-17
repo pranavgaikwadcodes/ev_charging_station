@@ -141,7 +141,7 @@ class BookingDetailsScreen extends StatelessWidget {
                                        const TextStyle(color: Colors.black)),
                                 ),
                                 onPressed: () {
-                                  Get.to(() =>  const MapScreen());
+                                  // Get.to(() =>  const MapScreen());
                                 },
                                 child:  const Text(
                                   "Locate on Map",
