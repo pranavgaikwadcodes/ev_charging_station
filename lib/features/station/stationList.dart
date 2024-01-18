@@ -191,3 +191,42 @@ List<Station> generateStations() {
 
   return Stations;
 }
+
+
+
+// {
+//   "stationID": 1,
+//   "name": "Charging Station 1",
+//   "description": "Description of Charging Station 1.",
+//   "address": "xyz abc city, pin, mh",
+//   "latitude": 18.507966,
+//   "longitude": 73.808073,
+//   "status": "active",
+//   "slots": [
+//     {"time": "12 AM", "status": "free", "bookedBy": null},
+//     {"time": "1 AM", "status": "free", "bookedBy": null},
+//     {"time": "2 AM", "status": "free", "bookedBy": null},
+//     {"time": "3 AM", "status": "free", "bookedBy": null},
+//     {"time": "4 AM", "status": "free", "bookedBy": null},
+//     {"time": "5 AM", "status": "free", "bookedBy": null},
+//     {"time": "6 AM", "status": "free", "bookedBy": null},
+//     {"time": "7 AM", "status": "free", "bookedBy": null},
+//     {"time": "8 AM", "status": "free", "bookedBy": null},
+//     {"time": "9 AM", "status": "free", "bookedBy": null},
+//     {"time": "10 AM", "status": "free", "bookedBy": null},
+//     {"time": "11 AM", "status": "free", "bookedBy": null},
+    
+//     {"time": "12 PM", "status": "free", "bookedBy": null},
+//     {"time": "1 PM", "status": "free", "bookedBy": null},
+//     {"time": "2 PM", "status": "free", "bookedBy": null},
+//     {"time": "3 PM", "status": "free", "bookedBy": null},
+//     {"time": "4 PM", "status": "free", "bookedBy": null},
+//     {"time": "5 PM", "status": "free", "bookedBy": null},
+//     {"time": "6 PM", "status": "free", "bookedBy": null},
+//     {"time": "7 PM", "status": "free", "bookedBy": null},
+//     {"time": "8 PM", "status": "free", "bookedBy": null},
+//     {"time": "9 PM", "status": "free", "bookedBy": null},
+//     {"time": "10 PM", "status": "free", "bookedBy": null},
+//     {"time": "11 PM", "status": "free", "bookedBy": null},
+//   ]
+// }

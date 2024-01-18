@@ -1,6 +1,7 @@
 import 'package:ev_charging_stations/features/authentication/controllers.onboarding/AuthenticationRepository.dart';
 import 'package:ev_charging_stations/features/screens/home/home.dart';
 import 'package:ev_charging_stations/features/screens/onboarding.dart';
+import 'package:ev_charging_stations/features/station/location_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -11,7 +12,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:get_storage/get_storage.dart';
 import 'firebase_options.dart';
 
-Future<void> main() async {
+void main() async {
   final WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
   await GetStorage.init();
@@ -20,11 +21,19 @@ Future<void> main() async {
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-  ).then((FirebaseApp value) => Get.put(AuthenticationRepository()));
+  ).then((FirebaseApp value) {
+    Get.put(AuthenticationRepository());
+    
+    LocationService locationService = LocationService();
+    double latitude = locationService.latitude;
+    double longitude = locationService.longitude;
+    print('Latitude: $latitude, Longitude: $longitude');
+
+
+  });
 
   runApp(const App());
 }
-
 
 class App extends StatelessWidget {
   const App({super.key});

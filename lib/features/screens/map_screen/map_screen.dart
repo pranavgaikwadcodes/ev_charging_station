@@ -1,9 +1,10 @@
-
-import 'package:ev_charging_stations/features/station/stationList.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ev_charging_stations/features/screens/bookslot/bookslot.dart';
 
-const LatLng currentLocation = LatLng(18.507029, 73.804565);
+import '../../station/station.dart';
 
 class MapScreen extends StatefulWidget {
   final int stationID;
@@ -11,39 +12,14 @@ class MapScreen extends StatefulWidget {
   const MapScreen({Key? key, required this.stationID}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _MapScreenState createState() => _MapScreenState();
-
-  Station fetchStationDetails(int stationID) {
-    // Fetch the list of stations
-    List<Station> stations = generateStations();
-
-    // Find the station in the list based on the ID
-    Station? foundStation = stations.firstWhere(
-      (station) => station.stationID == stationID,
-      orElse: () => Station(
-        stationID: -1,
-        name: 'Default Station',
-        description: 'No description available',
-        address: 'Unknown address',
-        latitude: 0.0,
-        longitude: 0.0,
-        status: 'Unknown status',
-      ),
-    );
-
-    // Return the found station or a default station if not found
-    return foundStation;
-  }
 }
 
 class _MapScreenState extends State<MapScreen> {
   late GoogleMapController mapController;
   final Map<String, Marker> _markers = {};
-
   Marker? tappedMarker;
   Set<MarkerId> tappedMarkerIds = <MarkerId>{};
-
   late Station currentStation;
 
   @override
@@ -65,7 +41,7 @@ class _MapScreenState extends State<MapScreen> {
             Navigator.pop(context);
           },
         ),
-        title: Text('Station Details - ${widget.stationID}'), // Convert stationID to String
+        title: Text('Station Details - ${widget.stationID}'),
       ),
       body: Column(
         children: [
@@ -73,10 +49,10 @@ class _MapScreenState extends State<MapScreen> {
             flex: 3,
             child: GoogleMap(
               initialCameraPosition: const CameraPosition(
-                target: currentLocation,
-                zoom: 14,
+                target: LatLng(0.0, 0.0), // Initial target, will be updated in onMapCreated
+                zoom: 16,
               ),
-              onMapCreated: onMapCreated, // Pass the callback here
+              onMapCreated: onMapCreated,
               markers: _markers.values.toSet(),
               onTap: (LatLng location) {
                 setState(() {
@@ -94,7 +70,7 @@ class _MapScreenState extends State<MapScreen> {
                   Column(
                     children: tappedMarkerIds.map((markerId) {
                       String markerKey = markerId.value;
-                      Marker tappedMarker = _markers[markerKey]!; // Convert markerId to String
+                      Marker tappedMarker = _markers[markerKey]!;
                       return Column(
                         children: [
                           Text(
@@ -113,9 +89,12 @@ class _MapScreenState extends State<MapScreen> {
                     }).toList(),
                   ),
                   const SizedBox(height: 10,),
-
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    // Fetch station details when the button is pressed
+                    currentStation = await fetchStationDetails(widget.stationID);
+                    Get.to(() => BookSlot(stationID: currentStation.stationID));
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 22, 22, 22),
                     side: const BorderSide(color: Color.fromARGB(255, 20, 20, 20)),
@@ -136,11 +115,11 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-    void onMapCreated(GoogleMapController controller) {
+  void onMapCreated(GoogleMapController controller) async {
     mapController = controller;
 
     // Fetch station details when the widget is created
-    currentStation = widget.fetchStationDetails(widget.stationID);
+    currentStation = await fetchStationDetails(widget.stationID);
 
     // Add a marker for the station
     addMarker(
@@ -149,11 +128,11 @@ class _MapScreenState extends State<MapScreen> {
       currentStation.description,
     );
 
-    // Zoom to the location of the station
+    // Update the initial camera position with the lat/long from Firestore
     mapController.animateCamera(
       CameraUpdate.newLatLngZoom(
         LatLng(currentStation.latitude, currentStation.longitude),
-        14.0, // You can adjust the zoom level as needed
+        14.0,
       ),
     );
   }
@@ -175,8 +154,8 @@ class _MapScreenState extends State<MapScreen> {
           tappedMarkerIds.add(MarkerId(id));
           _markers[id] = _markers[id]!.copyWith(
             infoWindowParam: InfoWindow(
-              title: currentStation.name, // Use name as the title
-              snippet: currentStation.address, // Use description as the snippet
+              title: currentStation.name,
+              snippet: currentStation.address,
             ),
           );
         });
@@ -188,8 +167,36 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
+  // Fetch basic station details from Firestore
+Future<Station> fetchStationDetails(int stationID) async {
+  try {
+    final DocumentSnapshot<Map<String, dynamic>> snapshot =
+        await FirebaseFirestore.instance.collection('stations').doc(stationID.toString()).get();
+
+    final data = snapshot.data();
+
+    if (data != null) {
+      return Station(
+        stationID: int.parse(snapshot.id),
+        name: data['name'] ?? '',
+        description: data['description'] ?? '',
+        address: data['address'] ?? '',
+        latitude: (data['latitude'] is double)
+            ? data['latitude']
+            : double.tryParse(data['latitude'].toString()) ?? 0.0,
+        longitude: (data['longitude'] is double)
+            ? data['longitude']
+            : double.tryParse(data['longitude'].toString()) ?? 0.0,
+        slots: [], // Empty list for slots
+      );
+    } else {
+      throw Exception('Data is null');
+    }
+  } catch (error) {
+    print('Error fetching station details: $error');
+    rethrow;
   }
+}
+
+
 }

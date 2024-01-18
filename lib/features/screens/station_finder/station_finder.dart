@@ -1,10 +1,46 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ev_charging_stations/features/screens/map_screen/map_screen.dart';
-import 'package:ev_charging_stations/features/station/stationList.dart';
+import 'package:ev_charging_stations/features/station/location_service.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'dart:math' as math;
 
-import 'package:get/get_core/src/get_main.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+class Slot {
+  final String time;
+  final String status;
+  final String? bookedBy;
+
+  Slot({
+    required this.time,
+    required this.status,
+    this.bookedBy,
+  });
+}
+
+class Station {
+  final String stationID;
+  final String name;
+  final String description;
+  final String address;
+  final double latitude;
+  final double longitude;
+  final String status;
+  final List<Slot> slots;
+
+  Station({
+    required this.stationID,
+    required this.name,
+    required this.description,
+    required this.address,
+    required this.latitude,
+    required this.longitude,
+    required this.status,
+    required this.slots,
+  });
+}
 
 class StationFinderScreen extends StatefulWidget {
   const StationFinderScreen({Key? key}) : super(key: key);
@@ -16,9 +52,96 @@ class StationFinderScreen extends StatefulWidget {
 class _StationFinderScreenState extends State<StationFinderScreen> {
   String? locationValue;
   String? vehicleTypeValue;
+  List<Station> stations = [];
 
-  // Use the generateStations function to get the list of stations
-  List<Station> stations = generateStations();
+  LocationService _locationService = LocationService();
+
+  LatLng currentLocation = const LatLng(0, 0);
+
+  bool isLoadingLocation = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize location service
+    _locationService = LocationService();
+
+    // Set loading to true initially
+    isLoadingLocation = true;
+
+    // Fetch stations data from Firestore when the screen initializes
+    fetchStations();
+
+    // Check if location permissions are granted before listening to updates
+    _locationService.requestPermission().then((LocationPermission permission) {
+      if (permission == LocationPermission.denied) {
+        print('Location permissions are denied');
+        // Update loading when permission is denied
+        setState(() {
+          isLoadingLocation = false;
+        });
+      } else if (permission == LocationPermission.deniedForever) {
+        print(
+            'Location permissions are permanently denied, we cannot request permissions.');
+        // Update loading when permission is permanently denied
+        setState(() {
+          isLoadingLocation = false;
+        });
+      } else {
+        print('Location permissions granted');
+        // Listen to location updates
+        _locationService.locationStream.listen((Position newPosition) {
+          print(
+              "New location: ${newPosition.latitude}, ${newPosition.longitude}");
+
+          setState(() {
+            currentLocation =
+                LatLng(newPosition.latitude, newPosition.longitude);
+            // Update loading when location is received
+            isLoadingLocation = false;
+          });
+        });
+      }
+    });
+  }
+
+  Future<void> fetchStations() async {
+    try {
+      final QuerySnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance.collection('stations').get();
+
+      setState(() {
+        // Map the Firestore data to the Station class
+        stations = snapshot.docs.map((doc) {
+          final data = doc.data();
+
+          // Use null-aware operators to handle possible null values
+          final List<dynamic> slotsData = data['slots'] ?? [];
+          final List<Slot> slots = slotsData.map((slotData) {
+            return Slot(
+              time: slotData['time'] ?? '',
+              status: slotData['status'] ?? '',
+              bookedBy: slotData['bookedBy'],
+            );
+          }).toList();
+
+          return Station(
+            stationID: doc.id,
+            name: data['name'] ?? '',
+            description: data['description'] ?? '',
+            address: data['address'] ?? '',
+            latitude: double.tryParse(data['latitude']?.toString() ?? '') ?? 0.0,
+            longitude: double.tryParse(data['longitude']?.toString() ?? '') ?? 0.0,
+            status: data['status'] ?? '',
+            slots: slots,
+          );
+        }).toList();
+      });
+    } catch (error) {
+      print('Error fetching stations: $error');
+    }
+  }
 
   Widget buildDropdownField(String labelText, List<String> items,
       String? selectedValue, void Function(String?) onChanged) {
@@ -34,9 +157,9 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
         ),
         items: items
             .map((String value) => DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                ))
+          value: value,
+          child: Text(value),
+        ))
             .toList(),
         onChanged: onChanged,
         value: selectedValue,
@@ -51,23 +174,23 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
     if (locationValue == 'Nearby') {
       filteredStations = stations
           .where((station) =>
-              calculateDistance(station.latitude, station.longitude,
-                  currentLocation.latitude, currentLocation.longitude) <=
-              2.5)
+      calculateDistance(station.latitude, station.longitude,
+          currentLocation.latitude, currentLocation.longitude) <=
+          2.5)
           .toList();
     } else if (locationValue == 'Less than 5 Km') {
       filteredStations = stations
           .where((station) =>
-              calculateDistance(station.latitude, station.longitude,
-                  currentLocation.latitude, currentLocation.longitude) <=
-              5.0)
+      calculateDistance(station.latitude, station.longitude,
+          currentLocation.latitude, currentLocation.longitude) <=
+          5.0)
           .toList();
     } else if (locationValue == 'Greater than 5 Km') {
       filteredStations = stations
           .where((station) =>
-              calculateDistance(station.latitude, station.longitude,
-                  currentLocation.latitude, currentLocation.longitude) >
-              5.0)
+      calculateDistance(station.latitude, station.longitude,
+          currentLocation.latitude, currentLocation.longitude) >
+          5.0)
           .toList();
     } else {
       // Show all stations if no location criteria is selected
@@ -125,7 +248,7 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
               'Select Location',
               ['Nearby', 'Less than 5 Km', 'Greater than 5 Km'],
               locationValue,
-              (String? value) {
+                  (String? value) {
                 setState(() {
                   locationValue = value;
                 });
@@ -198,11 +321,29 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
             const SizedBox(
               height: 10,
             ),
+            _buildMainContent(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMainContent() {
+    if (isLoadingLocation) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    } else {
+      return Expanded(
+        child: Column(
+          children: [
+            // ... Other UI elements ...
+
+            // Station List
             Expanded(
               child: ListView.builder(
-                padding: EdgeInsets.zero, // Set padding to zero
-                itemCount: stations
-                    .length, // Change this to the number of demo stations you want
+                padding: EdgeInsets.zero,
+                itemCount: stations.length,
                 itemBuilder: (context, index) {
                   if (index < filteredStations.length) {
                     // Station station = stations[index];
@@ -217,7 +358,7 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
                     );
                     return GestureDetector(
                       onTap: () {
-                        Get.to(() => MapScreen(stationID: station.stationID,), arguments: station.stationID);
+                        Get.to(() => MapScreen(stationID: int.parse(station.stationID),), arguments: station.stationID);
                       },
                       child: Card(
                         color: const Color.fromARGB(221, 228, 228, 228),
@@ -240,7 +381,7 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
                                                 fontWeight: FontWeight.w700,
                                                 color: Colors.black,
                                                 overflow:
-                                                    TextOverflow.ellipsis),
+                                                TextOverflow.ellipsis),
                                           ),
                                           Text(stations[index].description,
                                               style: const TextStyle(
@@ -292,16 +433,16 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
                                                     fontWeight: FontWeight.w700,
                                                     color: Colors.black),
                                                 overflow:
-                                                    TextOverflow.ellipsis),
+                                                TextOverflow.ellipsis),
                                             Text('Active',
                                                 style: TextStyle(
                                                     fontSize: 16,
                                                     color: Color.fromARGB(
                                                         255, 16, 156, 21),
                                                     fontWeight:
-                                                        FontWeight.w500),
+                                                    FontWeight.w500),
                                                 overflow:
-                                                    TextOverflow.ellipsis),
+                                                TextOverflow.ellipsis),
                                           ],
                                         ),
                                       )
@@ -323,7 +464,7 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
             ),
           ],
         ),
-      ),
-    );
+      );
+    }
   }
 }
