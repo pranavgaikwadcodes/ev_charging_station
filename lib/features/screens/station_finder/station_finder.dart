@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ev_charging_stations/features/screens/home/home.dart';
 import 'package:ev_charging_stations/features/screens/map_screen/map_screen.dart';
 import 'package:ev_charging_stations/features/station/location_service.dart';
 import 'package:flutter/material.dart';
@@ -231,7 +232,7 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
           icon: const Icon(Icons.arrow_back,
               color: Color.fromARGB(255, 255, 255, 255)),
           onPressed: () {
-            Navigator.pop(context);
+            Get.offAll(() => HomeScreen());
           },
         ),
         title: const Text("Station Finder"),

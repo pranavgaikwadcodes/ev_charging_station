@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ev_charging_stations/features/screens/map_screen/map_screen.dart';
+import 'package:ev_charging_stations/features/screens/payment/razorpay_payment.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -174,7 +175,7 @@ class _BookSlotState extends State<BookSlot> {
                       height: 16,
                     ),
                     const Text(
-                      "Book Slot",
+                      "Select Slot",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -182,16 +183,30 @@ class _BookSlotState extends State<BookSlot> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(
-                      height: 2,
+                      height: 5,
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        margin: const EdgeInsets.only(left: 4),
+                        child: const Text(
+                          "Orange: Already Booked\nGreen: Available\nDark Green: Selected",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 16,
                     ),
                     GridView.builder(
+                      padding: const EdgeInsets.all(0),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 6, // Number of cards in each row
-                        crossAxisSpacing:
-                            1.0, // Spacing between cards horizontally
-                        mainAxisSpacing:
-                            1.0, // Spacing between cards vertically
+                        crossAxisCount: 6,
                       ),
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -200,10 +215,11 @@ class _BookSlotState extends State<BookSlot> {
                         var slot = station.slots[index];
                         String status =
                             slot.containsKey('status') ? slot['status'] : '';
-                        Color defaultColor = Color.fromARGB(255, 0, 170, 14);
+                        Color defaultColor =
+                            const Color.fromARGB(255, 0, 170, 14);
                         Color selectedColor =
                             const Color.fromARGB(255, 0, 80, 4) ??
-                                Color.fromARGB(255, 0, 170, 14);
+                                const Color.fromARGB(255, 0, 170, 14);
                         Color cardColor = selectedSlots.contains(index)
                             ? selectedColor
                             : (status == 'booked'
@@ -226,13 +242,12 @@ class _BookSlotState extends State<BookSlot> {
                               return;
                             }
 
-                            // Handle the clicked slot time, for example, store it or perform some action
-                            print('Clicked slot time: ${slot['time']}');
+                            print('Clicked slot ID: $index, SLOT: $slot');
 
                             // Change card color to dark green when clicked
                             setState(() {
-                              cardColor = const Color.fromARGB(255, 0, 0, 0) ??
-                                  const Color.fromARGB(255, 167, 255, 170);
+                              cardColor = const Color.fromARGB(255, 0, 80, 4) ??
+                                  const Color.fromARGB(255, 0, 170, 14);
                             });
 
                             // You can store the clicked slot time in a state variable or perform other actions here
@@ -259,6 +274,80 @@ class _BookSlotState extends State<BookSlot> {
                           ),
                         );
                       },
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+
+                    // Conditionally show selected slots
+                    if (selectedSlots.isNotEmpty)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "Selected Slots:",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Wrap(
+                                spacing: 8,
+                                children: selectedSlots.map((index) {
+                                  var slot = station.slots[index];
+                                  return Chip(
+                                    label: Text(
+                                      '${slot['time']}',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+
+                    const SizedBox(
+                      height: 16,
+                    ),
+
+                    ElevatedButton(
+                      onPressed: selectedSlots.isNotEmpty
+                          ? () {
+                              // Handle the Confirm and Pay action
+                              Get.offAll(() => RazorPayPaymentScreen(stationID: widget.stationID));
+                            }
+                          : () {
+                              // Show a toast message indicating that a slot should be selected
+                              showToast('Please select a slot first');
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: selectedSlots.isNotEmpty
+                            ? const Color.fromARGB(255, 22, 22, 22)
+                            : const Color.fromARGB(255, 56, 56, 56), // Disabled color
+                        side: const BorderSide(
+                            color: Color.fromARGB(255, 20, 20, 20)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        "Confirm and Pay",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w700),
+                      ),
                     ),
                   ],
                 ),

@@ -1,3 +1,4 @@
+import 'package:ev_charging_stations/features/screens/station_finder/station_finder.dart' as StationFinderScreen;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -38,7 +39,7 @@ class _MapScreenState extends State<MapScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 255, 255, 255)),
           onPressed: () {
-            Navigator.pop(context);
+            Get.offAll(() => StationFinderScreen.StationFinderScreen());
           },
         ),
         title: Text('Station Details - ${widget.stationID}'),
