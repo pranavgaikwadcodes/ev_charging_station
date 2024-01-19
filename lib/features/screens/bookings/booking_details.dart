@@ -1,7 +1,14 @@
+import 'package:ev_charging_stations/features/screens/map_screen/map_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 class BookingDetailsScreen extends StatelessWidget {
-   const BookingDetailsScreen({Key? key}) : super(key: key);
+
+  final String stationName,date,time,stationAddress;
+  final int stationID;
+
+   const BookingDetailsScreen({Key? key, required this.stationName, required this.date, required this.time, required this.stationAddress, required this.stationID}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,28 +39,28 @@ class BookingDetailsScreen extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  child:  const Padding(
-                    padding: EdgeInsets.all(16),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           "Station Details",
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 16),
                         Text(
-                          "Station Name, Station Address, etc, etc demo data",
-                          style: TextStyle(
+                          'Name: $stationName\nAddress: $stationAddress',
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        SizedBox(height: 16),
-                        Row(
+                        const SizedBox(height: 16),
+                        const Row(
                           children: [
                             Text(
                               "Station Rating",
@@ -96,24 +103,24 @@ class BookingDetailsScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          "Date: 20-20-23",
-                          style: TextStyle(
+                        Text(
+                          "Date: $date",
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          "Time: 07:30:00 AM",
-                          style: TextStyle(
+                        Text(
+                          "Time: $time",
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                         const SizedBox(height: 16),
                         const Text(
-                          "Vehlice Type: 2 Wheeler",
+                          "Paid ✅",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -135,8 +142,14 @@ class BookingDetailsScreen extends StatelessWidget {
                                        const TextStyle(color: Colors.black)),
                                 ),
                                 onPressed: () {
-                                  // Get.to(() =>  const MapScreen());
-                                },
+  if (stationID != null) {
+    Get.to(() => MapScreen(stationID: stationID));
+  } else {
+    // Handle the case when stationID is null
+    print("Error: stationID is null");
+  }
+},
+
                                 child:  const Text(
                                   "Locate on Map",
                                   style: TextStyle(
@@ -144,26 +157,6 @@ class BookingDetailsScreen extends StatelessWidget {
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
                                   ),
-                                ),
-                              ),
-                            ),
-                             const SizedBox(width: 10),
-                            ElevatedButton(
-                              style: ButtonStyle(
-                                minimumSize: MaterialStateProperty.all(
-                                     const Size(20, 40)),
-                                backgroundColor:
-                                    MaterialStateProperty.all(Colors.black),
-                                textStyle: MaterialStateProperty.all(
-                                     const TextStyle(color: Colors.black)),
-                              ),
-                              onPressed: () {},
-                              child:  const Text(
-                                "Cancel Booking",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ),

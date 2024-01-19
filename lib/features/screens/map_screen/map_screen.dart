@@ -1,3 +1,4 @@
+import 'package:ev_charging_stations/features/screens/home/home.dart';
 import 'package:ev_charging_stations/features/screens/station_finder/station_finder.dart' as StationFinderScreen;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -39,10 +40,10 @@ class _MapScreenState extends State<MapScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 255, 255, 255)),
           onPressed: () {
-            Get.offAll(() => StationFinderScreen.StationFinderScreen());
+            Get.offAll(() => HomeScreen());
           },
         ),
-        title: Text('Station Details - ${widget.stationID}'),
+        title: const Text(''),
       ),
       body: Column(
         children: [
