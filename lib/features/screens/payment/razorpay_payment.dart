@@ -30,9 +30,6 @@ class _RazorPayPaymentScreenState extends State<RazorPayPaymentScreen> {
       'amount': amount,
       'name': 'EV Station',
       'prefill': {'email': user.email},
-      'external': {
-        'wallets': ['paytm']
-      }
     };
 
     try {
