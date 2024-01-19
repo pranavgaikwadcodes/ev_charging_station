@@ -1,30 +1,35 @@
 import 'package:ev_charging_stations/features/screens/map_screen/map_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 class BookingDetailsScreen extends StatelessWidget {
-
-  final String stationName,date,time,stationAddress;
+  final String stationName, date, time, stationAddress;
   final int stationID;
 
-   const BookingDetailsScreen({Key? key, required this.stationName, required this.date, required this.time, required this.stationAddress, required this.stationID}) : super(key: key);
+  const BookingDetailsScreen(
+      {Key? key,
+      required this.stationName,
+      required this.date,
+      required this.time,
+      required this.stationAddress,
+      required this.stationID})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor:  const Color.fromARGB(255, 0, 0, 0),
+        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
         elevation: 0,
         leading: IconButton(
-          icon:  const Icon(Icons.arrow_back,
+          icon: const Icon(Icons.arrow_back,
               color: Color.fromARGB(255, 255, 255, 255)),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title:  const Text("Station Booking Details"),
+        title: const Text("Station Booking Details"),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -90,7 +95,7 @@ class BookingDetailsScreen extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  child:  Padding(
+                  child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,21 +141,22 @@ class BookingDetailsScreen extends StatelessWidget {
                               child: ElevatedButton(
                                 style: ButtonStyle(
                                   minimumSize: MaterialStateProperty.all(
-                                       const Size(150, 40)),
-                                  backgroundColor: MaterialStateProperty.all(Colors.black),
+                                      const Size(150, 40)),
+                                  backgroundColor:
+                                      MaterialStateProperty.all(Colors.black),
                                   textStyle: MaterialStateProperty.all(
-                                       const TextStyle(color: Colors.black)),
+                                      const TextStyle(color: Colors.black)),
                                 ),
                                 onPressed: () {
-  if (stationID != null) {
-    Get.to(() => MapScreen(stationID: stationID));
-  } else {
-    // Handle the case when stationID is null
-    print("Error: stationID is null");
-  }
-},
-
-                                child:  const Text(
+                                  if (stationID != null) {
+                                    Get.to(
+                                        () => MapScreen(stationID: stationID));
+                                  } else {
+                                    // Handle the case when stationID is null
+                                    print("Error: stationID is null");
+                                  }
+                                },
+                                child: const Text(
                                   "Locate on Map",
                                   style: TextStyle(
                                     color: Colors.blue,
