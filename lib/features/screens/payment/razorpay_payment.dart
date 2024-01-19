@@ -1,19 +1,18 @@
 import 'package:ev_charging_stations/features/screens/bookings/view_bookings.dart';
 import 'package:ev_charging_stations/features/screens/bookslot/bookslot.dart';
-import 'package:ev_charging_stations/features/screens/home/home.dart';
-import 'package:ev_charging_stations/features/screens/map_screen/map_screen.dart';
+import 'package:ev_charging_stations/features/screens/payment/database_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class RazorPayPaymentScreen extends StatefulWidget {
   final int stationID;
+  final int slotID;
+  final String slotTime;
 
-  const RazorPayPaymentScreen({Key? key, required this.stationID})
+  const RazorPayPaymentScreen({Key? key, required this.stationID, required this.slotTime, required this.slotID})
       : super(key: key);
 
   @override
@@ -32,7 +31,7 @@ class _RazorPayPaymentScreenState extends State<RazorPayPaymentScreen> {
       'name': 'EV Station',
       'prefill': {'email': user.email},
       'external': {
-        'wallets': ['paytm', 'googlepay']
+        'wallets': ['paytm']
       }
     };
 
@@ -43,23 +42,35 @@ class _RazorPayPaymentScreenState extends State<RazorPayPaymentScreen> {
     }
   }
 
-  void handlePaymentSuccess(PaymentSuccessResponse response) {
+  void handlePaymentSuccess(PaymentSuccessResponse response) async {
 
-    // update in database
-    updateBookingsInDatabase(user, widget.stationID);
+    try {
+      // update in database
+      await DatabaseService().updateUser(widget.stationID, widget.slotTime);
+      await DatabaseService().updateStation(widget.stationID, widget.slotID);
+      
 
+      Get.offAll(() => const ViewBookingsScreen());
 
-    Get.offAll(() => const ViewBookingsScreen());
+      Fluttertoast.showToast(
+          msg: "Payment Successful ${response.paymentId!}",
+          toastLength: Toast.LENGTH_LONG);
 
-    Fluttertoast.showToast(
-        msg: "Payment Successful ${response.paymentId!}",
-        toastLength: Toast.LENGTH_LONG);
+    } catch (e) {
+      print('Error : $e');
+    }
   }
 
   void handlePaymentError(PaymentFailureResponse response) {
     Fluttertoast.showToast(
         msg: "Payment Error ${response.message!}",
         toastLength: Toast.LENGTH_LONG);
+  }
+
+  void handleExternalWallets(ExternalWalletResponse response) {
+    Fluttertoast.showToast(
+        msg: "ExternalWallets ${response.walletName!}",
+        toastLength: Toast.LENGTH_SHORT);
   }
 
   @override
@@ -75,8 +86,11 @@ class _RazorPayPaymentScreenState extends State<RazorPayPaymentScreen> {
     _razorpay = Razorpay();
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, handleExternalWallets);
 
     openCheckout(10);
+
+    print("myslot: ${widget.slotTime}");
   }
 
   @override
@@ -121,16 +135,14 @@ class _RazorPayPaymentScreenState extends State<RazorPayPaymentScreen> {
     );
   }
   
-  // Update in Firestore
-  void updateBookingsInDatabase(User user, int stationID) {
-    // update in users database
 
-    // update the station database
-  }
+
+
+
 }
 
 
-// users collection
-// email name age mobile 
+// this is my users collection
+// email, name, age, mobile and
 // vehicle array that has vehicle info 
 // need to create a bookings array that has ongoing array which has all info on the ongoing bookings

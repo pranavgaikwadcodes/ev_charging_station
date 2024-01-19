@@ -6,6 +6,9 @@ import 'package:get/get.dart';
 
 import '../../station/station.dart';
 
+late String slotTime;
+late int slotID;
+
 class BookSlot extends StatefulWidget {
   final int stationID;
 
@@ -16,6 +19,7 @@ class BookSlot extends StatefulWidget {
 }
 
 class _BookSlotState extends State<BookSlot> {
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
@@ -243,6 +247,9 @@ class _BookSlotState extends State<BookSlot> {
                             }
 
                             print('Clicked slot ID: $index, SLOT: $slot');
+                            slotTime = slot['time'];
+                            slotID = index;
+
 
                             // Change card color to dark green when clicked
                             setState(() {
@@ -327,7 +334,7 @@ class _BookSlotState extends State<BookSlot> {
                       onPressed: selectedSlots.isNotEmpty
                           ? () {
                               // Handle the Confirm and Pay action
-                              Get.offAll(() => RazorPayPaymentScreen(stationID: widget.stationID));
+                              Get.offAll(() => RazorPayPaymentScreen(stationID: widget.stationID, slotTime: slotTime, slotID: slotID));
                             }
                           : () {
                               // Show a toast message indicating that a slot should be selected

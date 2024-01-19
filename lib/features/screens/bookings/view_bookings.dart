@@ -1,4 +1,5 @@
 import 'package:ev_charging_stations/features/screens/bookings/booking_details.dart';
+import 'package:ev_charging_stations/features/screens/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -145,7 +146,7 @@ class ViewBookingsScreen extends StatelessWidget {
             icon: const Icon(Icons.arrow_back,
                 color: Color.fromARGB(255, 255, 255, 255)),
             onPressed: () {
-              Navigator.pop(context);
+              Get.offAll(HomeScreen());
             },
           ),
           title: const Text("View Bookings"),
