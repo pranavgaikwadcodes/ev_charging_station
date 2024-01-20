@@ -237,7 +237,7 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
             Get.offAll(() => HomeScreen());
           },
         ),
-        title: const Text("Station Finder"),
+        title: const Text("Station Finder", style: TextStyle(color: Colors.white),),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

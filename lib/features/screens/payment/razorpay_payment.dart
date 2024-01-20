@@ -103,14 +103,14 @@ class _RazorPayPaymentScreenState extends State<RazorPayPaymentScreen> {
             Get.offAll(() => BookSlot(stationID: widget.stationID));
           },
         ),
-        title: const Text("Payment Screen"),
+        title: const Text("Payment Screen", style: TextStyle(color: Colors.white),),
       ),
       body: Column(
         children: [
           const SizedBox(
             height: 100,
           ),
-          const Text("Please Dont close the App"),
+          const Text("Please Dont close the App. loading..."),
           const SizedBox(
             height: 10,
           ),
@@ -124,7 +124,8 @@ class _RazorPayPaymentScreenState extends State<RazorPayPaymentScreen> {
               fontSize: 18,
               fontWeight: FontWeight.w700
             ),),
-          )
+          ),
+          CircularProgressIndicator(color: Colors.black,),
 
         ],
       ),

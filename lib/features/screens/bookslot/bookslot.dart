@@ -64,7 +64,7 @@ class _BookSlotState extends State<BookSlot> {
                   Get.offAll(() => MapScreen(stationID: widget.stationID));
                 },
               ),
-              title: const Text("Slot Booking"),
+              title: const Text("Slot Booking", style: TextStyle(color: Colors.white),),
             ),
             body: Padding(
               padding: const EdgeInsets.all(16.0),

@@ -64,7 +64,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             Navigator.pop(context);
           },
         ),
-        title: const Text("User Profile"),
+        title: const Text("User Profile", style: TextStyle(color: Colors.white),),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

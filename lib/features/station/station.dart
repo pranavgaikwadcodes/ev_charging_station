@@ -1,5 +1,3 @@
-// station.dart
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Station {
@@ -28,7 +26,6 @@ class Station {
 
     // Check if data is not null before accessing fields
     if (data == null) {
-      // Handle the case where data is null (you can return a default or throw an exception)
       throw const FormatException("Document data is null");
     }
 

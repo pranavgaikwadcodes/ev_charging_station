@@ -137,7 +137,7 @@ Future<void> _updateFirestoreAfterDelete(int deletedIndex) async {
             Navigator.pop(context);
           },
         ),
-        title: const Text("Manage Vehicles"),
+        title: const Text("Manage Vehicles", style: TextStyle(color: Colors.white),),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

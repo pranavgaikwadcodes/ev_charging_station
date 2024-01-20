@@ -43,7 +43,7 @@ class _MapScreenState extends State<MapScreen> {
             Get.offAll(() => HomeScreen());
           },
         ),
-        title: const Text(''),
+        title: const Text('STation Detail: Map', style: TextStyle(color: Colors.white),),
       ),
       body: Column(
         children: [
