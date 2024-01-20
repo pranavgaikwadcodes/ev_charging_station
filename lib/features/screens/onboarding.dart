@@ -84,7 +84,7 @@ class OnBoardingPageIndicators extends StatelessWidget {
         child: SmoothPageIndicator(
         controller: controller.pageController,
         onDotClicked: controller.dotNavigationCtick, count: 3,
-        effect: ExpandingDotsEffect(dotHeight: 6,),));
+        effect: const ExpandingDotsEffect(dotHeight: 6,),));
   }
 }
 
@@ -120,7 +120,7 @@ class OnBoargingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
       child: Column(
         children: [
           Image(
@@ -130,7 +130,7 @@ class OnBoargingPage extends StatelessWidget {
           ),
           Text(
             title,
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
           const SizedBox(
@@ -138,7 +138,7 @@ class OnBoargingPage extends StatelessWidget {
           ),
           Text(
             subTitle,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 25,
             ),
             textAlign: TextAlign.center,

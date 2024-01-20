@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ManageVehiclesScreen extends StatefulWidget {
-  const ManageVehiclesScreen({Key? key}) : super(key: key);
+  const ManageVehiclesScreen({super.key});
 
   @override
   _ManageVehiclesScreenState createState() => _ManageVehiclesScreenState();
@@ -12,8 +12,8 @@ class ManageVehiclesScreen extends StatefulWidget {
 class _ManageVehiclesScreenState extends State<ManageVehiclesScreen> {
   String selectedVehicleType = '2 Wheeler';
   List<String> addedVehicles = []; // List to store currently added vehicles as strings
-  TextEditingController _brandController = TextEditingController();
-  TextEditingController _vehicleNameController = TextEditingController();
+  final TextEditingController _brandController = TextEditingController();
+  final TextEditingController _vehicleNameController = TextEditingController();
   final user = FirebaseAuth.instance.currentUser!;
 
   @override
@@ -202,11 +202,11 @@ Future<void> _updateFirestoreAfterDelete(int deletedIndex) async {
     );
   }
 
-  Widget buildProfileTextField(String label, IconData prefixIcon, TextEditingController _controller) {
+  Widget buildProfileTextField(String label, IconData prefixIcon, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
-        controller: _controller,
+        controller: controller,
         decoration: InputDecoration(
           prefixIcon: Icon(prefixIcon),
           labelText: label,
@@ -254,7 +254,7 @@ Future<void> _updateFirestoreAfterDelete(int deletedIndex) async {
     return addedVehicles.map((vehicle) => ListTile(
       title: Text(vehicle),
       trailing: IconButton(
-        icon: Icon(Icons.delete),
+        icon: const Icon(Icons.delete),
         onPressed: () {
           _deleteVehicle(vehicle);
           print(vehicle);

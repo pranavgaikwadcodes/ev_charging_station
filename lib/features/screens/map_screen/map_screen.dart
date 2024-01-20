@@ -1,5 +1,4 @@
 import 'package:ev_charging_stations/features/screens/home/home.dart';
-import 'package:ev_charging_stations/features/screens/station_finder/station_finder.dart' as StationFinderScreen;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -11,7 +10,7 @@ import '../../station/station.dart';
 class MapScreen extends StatefulWidget {
   final int stationID;
 
-  const MapScreen({Key? key, required this.stationID}) : super(key: key);
+  const MapScreen({super.key, required this.stationID});
 
   @override
   _MapScreenState createState() => _MapScreenState();
@@ -38,7 +37,8 @@ class _MapScreenState extends State<MapScreen> {
         backgroundColor: const Color.fromARGB(255, 0, 0, 0),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 255, 255, 255)),
+          icon: const Icon(Icons.arrow_back,
+              color: Color.fromARGB(255, 255, 255, 255)),
           onPressed: () {
             Get.offAll(() => HomeScreen());
           },
@@ -51,7 +51,8 @@ class _MapScreenState extends State<MapScreen> {
             flex: 3,
             child: GoogleMap(
               initialCameraPosition: const CameraPosition(
-                target: LatLng(0.0, 0.0), // Initial target, will be updated in onMapCreated
+                target: LatLng(0.0,
+                    0.0), // Initial target, will be updated in onMapCreated
                 zoom: 16,
               ),
               onMapCreated: onMapCreated,
@@ -61,6 +62,8 @@ class _MapScreenState extends State<MapScreen> {
                   tappedMarkerIds.clear();
                 });
               },
+              myLocationEnabled: true, // Enable the my location button
+              myLocationButtonEnabled: true, // Show the my location button
             ),
           ),
           Expanded(
@@ -90,23 +93,29 @@ class _MapScreenState extends State<MapScreen> {
                       );
                     }).toList(),
                   ),
-                  const SizedBox(height: 10,),
+                const SizedBox(
+                  height: 10,
+                ),
                 ElevatedButton(
                   onPressed: () async {
                     // Fetch station details when the button is pressed
-                    currentStation = await fetchStationDetails(widget.stationID);
+                    currentStation =
+                        await fetchStationDetails(widget.stationID);
                     Get.to(() => BookSlot(stationID: currentStation.stationID));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 22, 22, 22),
-                    side: const BorderSide(color: Color.fromARGB(255, 20, 20, 20)),
+                    side: const BorderSide(
+                        color: Color.fromARGB(255, 20, 20, 20)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   child: const Text(
                     "Book Slot",
-                    style: TextStyle(fontSize: 20, color: Color.fromARGB(255, 228, 228, 228)),
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: Color.fromARGB(255, 228, 228, 228)),
                   ),
                 ),
               ],
@@ -170,35 +179,36 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   // Fetch basic station details from Firestore
-Future<Station> fetchStationDetails(int stationID) async {
-  try {
-    final DocumentSnapshot<Map<String, dynamic>> snapshot =
-        await FirebaseFirestore.instance.collection('stations').doc(stationID.toString()).get();
+  Future<Station> fetchStationDetails(int stationID) async {
+    try {
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await FirebaseFirestore.instance
+              .collection('stations')
+              .doc(stationID.toString())
+              .get();
 
-    final data = snapshot.data();
+      final data = snapshot.data();
 
-    if (data != null) {
-      return Station(
-        stationID: int.parse(snapshot.id),
-        name: data['name'] ?? '',
-        description: data['description'] ?? '',
-        address: data['address'] ?? '',
-        latitude: (data['latitude'] is double)
-            ? data['latitude']
-            : double.tryParse(data['latitude'].toString()) ?? 0.0,
-        longitude: (data['longitude'] is double)
-            ? data['longitude']
-            : double.tryParse(data['longitude'].toString()) ?? 0.0,
-        slots: [], // Empty list for slots
-      );
-    } else {
-      throw Exception('Data is null');
+      if (data != null) {
+        return Station(
+          stationID: int.parse(snapshot.id),
+          name: data['name'] ?? '',
+          description: data['description'] ?? '',
+          address: data['address'] ?? '',
+          latitude: (data['latitude'] is double)
+              ? data['latitude']
+              : double.tryParse(data['latitude'].toString()) ?? 0.0,
+          longitude: (data['longitude'] is double)
+              ? data['longitude']
+              : double.tryParse(data['longitude'].toString()) ?? 0.0,
+          slots: [], // Empty list for slots
+        );
+      } else {
+        throw Exception('Data is null');
+      }
+    } catch (error) {
+      print('Error fetching station details: $error');
+      rethrow;
     }
-  } catch (error) {
-    print('Error fetching station details: $error');
-    rethrow;
   }
-}
-
-
 }

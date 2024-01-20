@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 
 class DatabaseService {
-  static FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final User? user = FirebaseAuth.instance.currentUser;
 
   Future<void> updateUser(int stationID, String slotTime) async {
@@ -13,17 +13,17 @@ class DatabaseService {
         DocumentReference userDocRef =
             FirebaseFirestore.instance.collection('users').doc(user!.email!);
 
-        String _date = DateFormat('yyyy-MM-dd').format(DateTime.now().toLocal());
-        String _time = slotTime;
-        int _stationID = stationID;
+        String date = DateFormat('yyyy-MM-dd').format(DateTime.now().toLocal());
+        String time = slotTime;
+        int stationID0 = stationID;
 
         // Update Firestore with the new booking
         await userDocRef.update({
           'bookings': FieldValue.arrayUnion([
             {
-              'stationID': _stationID,
-              'time': _time,
-              'date': _date,
+              'stationID': stationID0,
+              'time': time,
+              'date': date,
             }
           ]),
         });
@@ -50,14 +50,14 @@ class DatabaseService {
       // Get the current slots array
       List<Map<String, dynamic>> slots = List<Map<String, dynamic>>.from(stationData['slots'] as List);
 
-      int _time = slotID;
+      int time = slotID;
       String suffix;
 
       if(slotID == 0){
-        _time = _time + 12;
+        time = time + 12;
         suffix = 'AM';
       } else if(slotID > 12){
-        _time = _time - 12;
+        time = time - 12;
         suffix = 'PM';
       } else {
         suffix = 'AM';
@@ -65,7 +65,7 @@ class DatabaseService {
 
       // Update the specific slot
       slots[slotID] = {
-        'time': "$_time $suffix",
+        'time': "$time $suffix",
         'status': 'booked',
         'bookedBy': user!.email,
       };

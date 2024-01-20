@@ -27,12 +27,16 @@ class ViewBookingsScreen extends StatelessWidget {
               Get.offAll(HomeScreen());
             },
           ),
-          title: const Text("View Bookings"),
+          title: const Text("View Bookings", style: TextStyle(color: Colors.white),),
           bottom: const TabBar(
             tabs: [
               Tab(text: "Ongoing Booking"),
               Tab(text: "Booking History"),
             ],
+            labelStyle: TextStyle(
+              color: Colors.white,
+              fontSize: 16
+            ),
           ),
         ),
         body: Padding(
@@ -73,6 +77,8 @@ class ViewBookingsScreen extends StatelessWidget {
                               date: booking.date,
                               time: booking.time,
                               stationAddress: booking.stationAddress,
+                              lat: booking.latitude,
+                              long: booking.longitude,
                             ),
                         ],
                       );
@@ -126,8 +132,13 @@ class ViewBookingsScreen extends StatelessWidget {
             stationName: stationSnapshot.data()?['name'] ?? 'Unknown Station',
             date: bookingData['date'] ?? 'Unknown Date',
             time: bookingData['time'] ?? 'Unknown Time',
+            latitude: double.tryParse(stationSnapshot['latitude']?.toString() ?? '') ?? 0.0,
+            longitude: double.tryParse(stationSnapshot['longitude']?.toString() ?? '') ?? 0.0,
             stationAddress: stationSnapshot.data()?['address'] ?? 'Unknown Address',
+
           );
+          
+          printInfo(info: "LAT LONG : ${stationSnapshot['latitude']}, ${stationSnapshot['longitude']}");
           bookings.add(booking);
         } else {
           print("Station details do not exist for stationID: $stationID");
@@ -150,35 +161,43 @@ class BookingData {
   final String date;
   final String time;
   final String stationAddress;
+  final double latitude;
+  final double longitude;
 
   BookingData({
     required this.stationName,
     required this.date,
     required this.time,
-    required this.stationAddress,
+    required this.stationAddress, 
+    required this.latitude,
+    required this.longitude,
   });
 }
 
 class BookingCard extends StatelessWidget {
   const BookingCard({
-    Key? key,
+    super.key,
     required this.stationName,
     required this.date,
     required this.time,
     required this.stationAddress,
-  }) : super(key: key);
+    required this.lat,
+    required this.long,
+  });
 
   final String stationName;
   final String date;
   final String time;
   final String stationAddress;
+  final double lat;
+  final double long;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 5,
       shadowColor: const Color.fromARGB(255, 34, 34, 34),
-      color: Color.fromARGB(255, 0, 0, 0),
+      color: const Color.fromARGB(255, 0, 0, 0),
       child: SizedBox(
         height: 150,
         width: 400,
@@ -213,7 +232,7 @@ class BookingCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          "${date}, ${time}",
+                          "$date, $time",
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -245,7 +264,7 @@ class BookingCard extends StatelessWidget {
                         minimumSize:
                             MaterialStateProperty.all(const Size(150, 40)),
                         backgroundColor: MaterialStateProperty.all(
-                            Color.fromARGB(255, 176, 255, 144)),
+                            const Color.fromARGB(255, 176, 255, 144)),
                         textStyle: MaterialStateProperty.all(
                             const TextStyle(color: Colors.black)),
                       ),
@@ -257,6 +276,8 @@ class BookingCard extends StatelessWidget {
                             date: date,
                             time: time,
                             stationAddress: stationAddress,
+                            latitude: lat.toString(),
+                            longitude: long.toString(),
                           ),
                         );
                       },

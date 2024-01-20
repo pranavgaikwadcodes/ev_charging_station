@@ -12,8 +12,7 @@ class RazorPayPaymentScreen extends StatefulWidget {
   final int slotID;
   final String slotTime;
 
-  const RazorPayPaymentScreen({Key? key, required this.stationID, required this.slotTime, required this.slotID})
-      : super(key: key);
+  const RazorPayPaymentScreen({super.key, required this.stationID, required this.slotTime, required this.slotID});
 
   @override
   State<RazorPayPaymentScreen> createState() => _RazorPayPaymentScreenState();

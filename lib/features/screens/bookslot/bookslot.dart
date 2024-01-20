@@ -12,7 +12,7 @@ late int slotID;
 class BookSlot extends StatefulWidget {
   final int stationID;
 
-  const BookSlot({Key? key, required this.stationID}) : super(key: key);
+  const BookSlot({super.key, required this.stationID});
 
   @override
   State<BookSlot> createState() => _BookSlotState();

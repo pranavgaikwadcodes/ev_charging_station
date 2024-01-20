@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'dart:math' as math;
-
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Slot {
@@ -44,7 +44,7 @@ class Station {
 }
 
 class StationFinderScreen extends StatefulWidget {
-  const StationFinderScreen({Key? key}) : super(key: key);
+  const StationFinderScreen({super.key});
 
   @override
   _StationFinderScreenState createState() => _StationFinderScreenState();
@@ -132,8 +132,10 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
             name: data['name'] ?? '',
             description: data['description'] ?? '',
             address: data['address'] ?? '',
-            latitude: double.tryParse(data['latitude']?.toString() ?? '') ?? 0.0,
-            longitude: double.tryParse(data['longitude']?.toString() ?? '') ?? 0.0,
+            latitude:
+                double.tryParse(data['latitude']?.toString() ?? '') ?? 0.0,
+            longitude:
+                double.tryParse(data['longitude']?.toString() ?? '') ?? 0.0,
             status: data['status'] ?? '',
             slots: slots,
           );
@@ -158,9 +160,9 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
         ),
         items: items
             .map((String value) => DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        ))
+                  value: value,
+                  child: Text(value),
+                ))
             .toList(),
         onChanged: onChanged,
         value: selectedValue,
@@ -175,23 +177,23 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
     if (locationValue == 'Nearby') {
       filteredStations = stations
           .where((station) =>
-      calculateDistance(station.latitude, station.longitude,
-          currentLocation.latitude, currentLocation.longitude) <=
-          2.5)
+              calculateDistance(station.latitude, station.longitude,
+                  currentLocation.latitude, currentLocation.longitude) <=
+              2.5)
           .toList();
     } else if (locationValue == 'Less than 5 Km') {
       filteredStations = stations
           .where((station) =>
-      calculateDistance(station.latitude, station.longitude,
-          currentLocation.latitude, currentLocation.longitude) <=
-          5.0)
+              calculateDistance(station.latitude, station.longitude,
+                  currentLocation.latitude, currentLocation.longitude) <=
+              5.0)
           .toList();
     } else if (locationValue == 'Greater than 5 Km') {
       filteredStations = stations
           .where((station) =>
-      calculateDistance(station.latitude, station.longitude,
-          currentLocation.latitude, currentLocation.longitude) >
-          5.0)
+              calculateDistance(station.latitude, station.longitude,
+                  currentLocation.latitude, currentLocation.longitude) >
+              5.0)
           .toList();
     } else {
       // Show all stations if no location criteria is selected
@@ -249,7 +251,7 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
               'Select Location',
               ['Nearby', 'Less than 5 Km', 'Greater than 5 Km'],
               locationValue,
-                  (String? value) {
+              (String? value) {
                 setState(() {
                   locationValue = value;
                 });
@@ -291,6 +293,7 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
                       });
                     },
                     style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 79, 156, 255),
                       side: const BorderSide(
                           color: Color.fromARGB(255, 137, 174, 223)),
                       shape: RoundedRectangleBorder(
@@ -301,7 +304,7 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
                       'Reset',
                       style: TextStyle(
                           fontSize: 18,
-                          color: Color.fromARGB(255, 253, 253, 253)),
+                          color: Color.fromARGB(255, 255, 255, 255)),
                     ),
                   ),
                 ),
@@ -336,134 +339,179 @@ class _StationFinderScreenState extends State<StationFinderScreen> {
       );
     } else {
       return Expanded(
-        child: Column(
-          children: [
-            // ... Other UI elements ...
+        child: ListView.builder(
+          padding: EdgeInsets.zero,
+          itemCount: filteredStations.length,
+          itemBuilder: (context, index) {
+            Station station = filteredStations[index];
 
-            // Station List
-            Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.zero,
-                itemCount: stations.length,
-                itemBuilder: (context, index) {
-                  if (index < filteredStations.length) {
-                    // Station station = stations[index];
-                    Station station = filteredStations[index];
+            double distance = calculateDistance(
+              station.latitude,
+              station.longitude,
+              currentLocation.latitude,
+              currentLocation.longitude,
+            );
 
-                    // Calculate distance
-                    double distance = calculateDistance(
-                      station.latitude,
-                      station.longitude,
-                      currentLocation.latitude,
-                      currentLocation.longitude,
-                    );
-                    return GestureDetector(
-                      onTap: () {
-                        Get.to(() => MapScreen(stationID: int.parse(station.stationID),), arguments: station.stationID);
-                      },
-                      child: Card(
-                        color: const Color.fromARGB(221, 228, 228, 228),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Column(
+            return GestureDetector(
+              onTap: () {
+                Get.to(
+                  () => MapScreen(
+                    stationID: int.parse(station.stationID),
+                  ),
+                  arguments: station.stationID,
+                );
+              },
+              child: Card(
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                color: Colors.transparent,
+                elevation: 0,
+                child: Stack(
+                  children: [
+                    SizedBox(
+                      width: 371.4,
+                      height: 105,
+                      child: Image.asset(
+                        'assets/evstation_charging.jpeg',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Container(
+                        color: Colors.black.withOpacity(0.4),
+                        width: 371.4,
+                        height: 105,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 4,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      SizedBox(
-                                        width: 169,
-                                        child: Column(children: [
-                                          Text(
-                                            stations[index].name,
-                                            style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w700,
-                                                color: Colors.black,
-                                                overflow:
-                                                TextOverflow.ellipsis),
-                                          ),
-                                          Text(stations[index].description,
-                                              style: const TextStyle(
-                                                  fontSize: 16,
-                                                  color: Colors.blue,
-                                                  fontWeight: FontWeight.w500),
-                                              overflow: TextOverflow.ellipsis),
-                                        ]),
-                                      )
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Column(
-                                    children: [
-                                      SizedBox(
-                                        width: 80,
-                                        child: Column(children: [
-                                          const Text('Distance',
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Colors.black),
-                                              overflow: TextOverflow.ellipsis),
-                                          Text(
-                                              '${distance.toStringAsFixed(2)} km',
-                                              style: const TextStyle(
-                                                  fontSize: 16,
-                                                  color: Colors.black87,
-                                                  fontWeight: FontWeight.w500),
-                                              overflow: TextOverflow.ellipsis),
-                                        ]),
-                                      )
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  const Column(
-                                    children: [
-                                      SizedBox(
-                                        width: 60,
-                                        child: Column(
-                                          children: [
-                                            Text('Status',
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Colors.black),
-                                                overflow:
-                                                TextOverflow.ellipsis),
-                                            Text('Active',
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: Color.fromARGB(
-                                                        255, 16, 156, 21),
-                                                    fontWeight:
-                                                    FontWeight.w500),
-                                                overflow:
-                                                TextOverflow.ellipsis),
+                                      // Star Rating
+                                      RatingBar.builder(
+                                        initialRating:
+                                            4, // You can set the initial rating here
+                                        minRating: 1,
+                                        direction: Axis.horizontal,
+                                        allowHalfRating: true,
+                                        itemCount: 5,
+                                        itemSize: 20,
+                                        itemBuilder: (context, _) => const Icon(
+                                          Icons.star,
+                                          color: Colors.amber,
+                                        ),
+                                        onRatingUpdate: (rating) {
+                                          // Handle rating updates
+                                        },
+                                      ),
+                                      SizedBox(height: 5,),
+
+                                      const Text(
+                                        'Distance',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white70,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        '${distance.toStringAsFixed(2)} km',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Color.fromARGB(
+                                              255, 255, 255, 255),
+                                          fontWeight: FontWeight.w900,
+                                          shadows: [
+                                            Shadow(
+                                              color: Color.fromARGB(255, 0, 0, 0),
+                                              offset: Offset(-2, 2),
+                                              blurRadius: 5,
+                                            ),
                                           ],
                                         ),
-                                      )
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ],
                                   ),
-                                ],
-                              ),
-                            ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            flex: 6,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        station.name,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white,
+                                          shadows: [
+                                            Shadow(
+                                              color: Color.fromARGB(255, 0, 0, 0),
+                                              offset: Offset(-2, 2),
+                                              blurRadius: 5,
+                                            ),
+                                          ],
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      Text(
+                                        station.description,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Color.fromARGB(
+                                              255, 255, 255, 255),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Dummy Rating (can be replaced by actual data)
+                                const Text(
+                                  'Rating: 4.5', // Dummy rating, replace with actual data
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  } else {
-                    // Handle the case where index is out of bounds
-                    return Container(); // You can return an empty container or a placeholder widget
-                  }
-                },
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            );
+          },
         ),
       );
     }

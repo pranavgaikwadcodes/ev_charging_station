@@ -9,25 +9,25 @@ class GridDashboard extends StatelessWidget {
   Items item1 = Items(
     title: "Profile",
     description: "Manage your profile.",
-    destinationPage: UserProfilePage(),
+    destinationPage: const UserProfilePage(),
   );
 
   Items item2 = Items(
     title: "Manage Vehicles",
     description: "Manage your Vehicles.",
-    destinationPage: ManageVehiclesScreen(),
+    destinationPage: const ManageVehiclesScreen(),
   );
 
   Items item3 = Items(
     title: "View Bookings",
     description: "View Your Bookings.",
-    destinationPage: ViewBookingsScreen(),
+    destinationPage: const ViewBookingsScreen(),
   );
 
   Items item4 = Items(
     title: "Station Finder",
     description: "Find Nearby EV Station.",
-    destinationPage: StationFinderScreen(),
+    destinationPage: const StationFinderScreen(),
   );
 
   GridDashboard({super.key});

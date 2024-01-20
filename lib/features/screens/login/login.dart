@@ -3,14 +3,9 @@ import 'package:ev_charging_stations/features/screens/home/home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/get_navigation.dart';
 import 'package:ev_charging_stations/features/screens/signup/signup.dart';
 
 
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 
 
@@ -36,7 +31,7 @@ class LoginController extends GetxController {
       // User is already logged in
       print("User is already logged in: ${user.uid}");
       // Defer navigation until after the frame is built
-      WidgetsBinding.instance?.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         Get.offAll(() => HomeScreen());
       });
     } else {
@@ -85,7 +80,7 @@ class LoginController extends GetxController {
 }
 
 class LoginScreen extends StatelessWidget {
-  LoginScreen({Key? key}) : super(key: key);
+  LoginScreen({super.key});
 
   final LoginController loginController = Get.put(LoginController());
 

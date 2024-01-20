@@ -1,19 +1,22 @@
 import 'package:ev_charging_stations/features/screens/map_screen/map_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BookingDetailsScreen extends StatelessWidget {
-  final String stationName, date, time, stationAddress;
+  final String stationName, date, time, stationAddress, latitude, longitude;
   final int stationID;
 
   const BookingDetailsScreen(
-      {Key? key,
+      {super.key,
       required this.stationName,
       required this.date,
       required this.time,
       required this.stationAddress,
-      required this.stationID})
-      : super(key: key);
+      required this.stationID,
+      required this.latitude,
+      required this.longitude,
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +32,7 @@ class BookingDetailsScreen extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        title: const Text("Station Booking Details"),
+        title: const Text("Station Booking Details", style: TextStyle(color: Colors.white),),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -40,6 +43,7 @@ class BookingDetailsScreen extends StatelessWidget {
                   height: 110,
                 ),
                 Card(
+
                   elevation: 5,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
@@ -90,6 +94,7 @@ class BookingDetailsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+                SizedBox(height: 20,),
                 Card(
                   elevation: 5,
                   shape: RoundedRectangleBorder(
@@ -148,16 +153,40 @@ class BookingDetailsScreen extends StatelessWidget {
                                       const TextStyle(color: Colors.black)),
                                 ),
                                 onPressed: () {
-                                  if (stationID != null) {
-                                    Get.to(
-                                        () => MapScreen(stationID: stationID));
-                                  } else {
-                                    // Handle the case when stationID is null
-                                    print("Error: stationID is null");
-                                  }
-                                },
+                                  Get.to(
+                                      () => MapScreen(stationID: stationID));
+                                                                },
                                 child: const Text(
                                   "Locate on Map",
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                  minimumSize: MaterialStateProperty.all(
+                                      const Size(150, 40)),
+                                  backgroundColor:
+                                  MaterialStateProperty.all(Color.fromARGB(255,255,255,255)),
+                                  textStyle: MaterialStateProperty.all(
+                                      const TextStyle(color: Colors.black)),
+                                ),
+                                onPressed: () {
+                                  openMaps(latitude,longitude);
+                                },
+                                child: const Text(
+                                  "Get Directions",
                                   style: TextStyle(
                                     color: Colors.blue,
                                     fontSize: 16,
@@ -177,4 +206,16 @@ class BookingDetailsScreen extends StatelessWidget {
       ),
     );
   }
+  
+  void openMaps(String latitude, String longitude) {
+    try {
+      var url = 'https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude';
+      final Uri _url = Uri.parse(url);
+      print('mapsURL: $_url');
+      launchUrl(_url);
+    } catch (e) {
+      print('Error Launching Maps: $e');
+    }
+  }
+
 }

@@ -29,7 +29,7 @@ class Station {
     // Check if data is not null before accessing fields
     if (data == null) {
       // Handle the case where data is null (you can return a default or throw an exception)
-      throw FormatException("Document data is null");
+      throw const FormatException("Document data is null");
     }
 
     // Ensure proper conversion for latitude and longitude
