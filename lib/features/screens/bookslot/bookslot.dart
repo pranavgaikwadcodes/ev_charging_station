@@ -8,6 +8,7 @@ import '../../station/station.dart';
 
 late String slotTime;
 late int slotID;
+late int slotClickedID;
 
 class BookSlot extends StatefulWidget {
   final int stationID;
@@ -19,7 +20,6 @@ class BookSlot extends StatefulWidget {
 }
 
 class _BookSlotState extends State<BookSlot> {
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
@@ -64,7 +64,10 @@ class _BookSlotState extends State<BookSlot> {
                   Get.offAll(() => MapScreen(stationID: widget.stationID));
                 },
               ),
-              title: const Text("Slot Booking", style: TextStyle(color: Colors.white),),
+              title: const Text(
+                "Slot Booking",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             body: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -203,6 +206,9 @@ class _BookSlotState extends State<BookSlot> {
                         ),
                       ),
                     ),
+                    
+                    const Text("Port 1"),
+
                     const SizedBox(
                       height: 16,
                     ),
@@ -225,7 +231,7 @@ class _BookSlotState extends State<BookSlot> {
                             const Color.fromARGB(255, 0, 80, 4) ??
                                 const Color.fromARGB(255, 0, 170, 14);
                         Color cardColor = selectedSlots.contains(index)
-                            ? selectedColor
+                            ? ((slotClickedID == 1) ? selectedColor : defaultColor)
                             : (status == 'booked'
                                 ? Colors.orange
                                 : defaultColor);
@@ -249,7 +255,6 @@ class _BookSlotState extends State<BookSlot> {
                             print('Clicked slot ID: $index, SLOT: $slot');
                             slotTime = slot['time'];
                             slotID = index;
-
 
                             // Change card color to dark green when clicked
                             setState(() {
@@ -286,8 +291,95 @@ class _BookSlotState extends State<BookSlot> {
                       height: 16,
                     ),
 
+                    // if station slot_2 is not present dont show this section
+                    if(station.slots_2.isNotEmpty)
+                      const Text("Port 2"),
+
+                    // slot section 2
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    GridView.builder(
+                      padding: const EdgeInsets.all(0),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 6,
+                      ),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: station.slots_2.length,
+                      itemBuilder: (context, index2) {
+                        var slot2 = station.slots_2[index2];
+                        // printInfo(info: "Slots_2 : ${slot}");
+                        String status =
+                            slot2.containsKey('status') ? slot2['status'] : '';
+                        Color defaultColor =
+                            const Color.fromARGB(255, 0, 170, 14);
+                        Color selectedColor =
+                            const Color.fromARGB(255, 0, 80, 4);
+                        Color cardColor = selectedSlots.contains(index2)
+                            ? ((slotClickedID == 2) ? selectedColor : defaultColor)
+                            : (status == 'booked'
+                                ? Colors.orange
+                                : defaultColor);
+
+                        return GestureDetector(
+                          onTap: () {
+                            var slot2 = station.slots_2[index2];
+                            String status = slot2.containsKey('status')
+                                ? slot2['status']
+                                : '';
+
+                            if (status == 'booked') {
+                              // Show a toast message indicating that the slot is already booked
+                              showToast('Slot already booked');
+
+                              // You can choose to return early or perform other actions as needed
+                              return;
+                            }
+
+                            print('Clicked slot2 ID: $index2, SLOT: $slot2');
+                            slotTime = slot2['time'];
+                            slotID = index2;
+
+                            // Change card color to dark green when clicked
+                            setState(() {
+                              cardColor = const Color.fromARGB(255, 0, 80, 4) ??
+                                  const Color.fromARGB(255, 0, 170, 14);
+                            });
+
+                            // You can store the clicked slot time in a state variable or perform other actions here
+                            handleSlot2Selection(index2);
+                          },
+                          child: Card(
+                            color: selectedSlots2.contains(index2)
+                                ? selectedColor
+                                : cardColor,
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(
+                                  0), // Set contentPadding to zero
+                              title: Center(
+                                // Center the text
+                                child: Text(
+                                  '${slot2['time']}',
+                                  style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(
+                      height: 16,
+                    ),
+
                     // Conditionally show selected slots
-                    if (selectedSlots.isNotEmpty)
+                    if (selectedSlots.isNotEmpty || selectedSlots2.isNotEmpty)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -308,18 +400,33 @@ class _BookSlotState extends State<BookSlot> {
                               ),
                               Wrap(
                                 spacing: 8,
-                                children: selectedSlots.map((index) {
-                                  var slot = station.slots[index];
-                                  return Chip(
-                                    label: Text(
-                                      '${slot['time']}',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
+                                children: (selectedSlots.isNotEmpty)
+                                    ? selectedSlots.map((index2) {
+                                        var slot = station.slots[index2];
+                                        return Chip(
+                                          label: Text(
+                                            '${slot['time']}, Port 1',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList()
+                                    : (selectedSlots2.isNotEmpty)
+                                        ? selectedSlots2.map((index2) {
+                                            var slot2 = station.slots_2[index2];
+                                            return Chip(
+                                              label: Text(
+                                                '${slot2['time']}, Port 2',
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList()
+                                        : [const Text('No slots selected')],
                               ),
                             ],
                           )
@@ -331,19 +438,24 @@ class _BookSlotState extends State<BookSlot> {
                     ),
 
                     ElevatedButton(
-                      onPressed: selectedSlots.isNotEmpty
+                      onPressed: selectedSlots.isNotEmpty || selectedSlots2.isNotEmpty
                           ? () {
                               // Handle the Confirm and Pay action
-                              Get.offAll(() => RazorPayPaymentScreen(stationID: widget.stationID, slotTime: slotTime, slotID: slotID));
+                              Get.offAll(() => RazorPayPaymentScreen(
+                                  stationID: widget.stationID,
+                                  slotTime: slotTime,
+                                  slotID: slotID,
+                                  slotSelected: slotClickedID));
                             }
                           : () {
                               // Show a toast message indicating that a slot should be selected
                               showToast('Please select a slot first');
                             },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: selectedSlots.isNotEmpty
+                        backgroundColor: selectedSlots.isNotEmpty || selectedSlots2.isNotEmpty
                             ? const Color.fromARGB(255, 22, 22, 22)
-                            : const Color.fromARGB(255, 56, 56, 56), // Disabled color
+                            : const Color.fromARGB(
+                                255, 56, 56, 56), // Disabled color
                         side: const BorderSide(
                             color: Color.fromARGB(255, 20, 20, 20)),
                         shape: RoundedRectangleBorder(
@@ -353,7 +465,9 @@ class _BookSlotState extends State<BookSlot> {
                       child: const Text(
                         "Confirm and Pay",
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w700),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white),
                       ),
                     ),
                   ],
@@ -367,14 +481,28 @@ class _BookSlotState extends State<BookSlot> {
   }
 
   List<int> selectedSlots = [];
+  List<int> selectedSlots2 = [];
 
   // Add a method to handle the selection of slots
   void handleSlotSelection(int index) {
     if (selectedSlots.contains(index)) {
       selectedSlots.remove(index);
     } else {
+      slotClickedID = 1;
       selectedSlots.clear();
+      selectedSlots2.clear();
       selectedSlots.add(index);
+    }
+  }
+
+  void handleSlot2Selection(int index) {
+    if (selectedSlots2.contains(index)) {
+      selectedSlots2.remove(index);
+    } else {
+      slotClickedID = 2;
+      selectedSlots.clear();
+      selectedSlots2.clear();
+      selectedSlots2.add(index);
     }
   }
 

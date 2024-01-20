@@ -202,6 +202,7 @@ class _MapScreenState extends State<MapScreen> {
               ? data['longitude']
               : double.tryParse(data['longitude'].toString()) ?? 0.0,
           slots: [], // Empty list for slots
+          slots_2: [], // Empty list for slots
         );
       } else {
         throw Exception('Data is null');

@@ -33,6 +33,9 @@ class ViewBookingsScreen extends StatelessWidget {
               Tab(text: "Ongoing Booking"),
               Tab(text: "Booking History"),
             ],
+            indicatorColor: Color.fromARGB(255, 170, 252, 149),
+            indicatorSize: TabBarIndicatorSize.tab,
+            indicatorWeight: 5,
             labelStyle: TextStyle(
               color: Colors.white,
               fontSize: 16

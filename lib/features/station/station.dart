@@ -8,6 +8,7 @@ class Station {
   final double latitude;
   final double longitude;
   final List<dynamic> slots;
+  final List<dynamic> slots_2;
   
   Station({
     required this.stationID,
@@ -17,6 +18,7 @@ class Station {
     required this.latitude,
     required this.longitude,
     required this.slots,
+    required this.slots_2,
   });
 
   // Factory method to create a Station object from a DocumentSnapshot
@@ -45,6 +47,7 @@ class Station {
       latitude: latitude ?? 0.0, // Default to 0.0 if latitude is null
       longitude: longitude ?? 0.0, // Default to 0.0 if longitude is null
       slots: data['slots'] ?? [],
+      slots_2: data['slots_2'] ?? [],
     );
   }
 

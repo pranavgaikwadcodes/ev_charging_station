@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class DatabaseService {
@@ -37,51 +38,65 @@ class DatabaseService {
     }
   }
 
-  Future<void> updateStation(int stationID, int slotID) async {
-  try {
-    if (user != null) {
-      // Get the reference to the station document
-      DocumentReference stationDocRef = _firestore.collection('stations').doc(stationID.toString());
+  Future<void> updateStation(int stationID, int slotID, int slotSelected) async {
+  
+  printInfo(info: 'SlotSelected: $slotSelected');
+  
+    try {
 
-      // Fetch the current station document
-      DocumentSnapshot stationSnapshot = await stationDocRef.get();
-      Map<String, dynamic> stationData = stationSnapshot.data() as Map<String, dynamic>;
-
-      // Get the current slots array
-      List<Map<String, dynamic>> slots = List<Map<String, dynamic>>.from(stationData['slots'] as List);
-
-      int time = slotID;
-      String suffix;
-
-      if(slotID == 0){
-        time = time + 12;
-        suffix = 'AM';
-      } else if(slotID > 12){
-        time = time - 12;
-        suffix = 'PM';
+      // Check for which slot to update
+      String slotToUpdate = '';
+      if(slotSelected == 1) {
+        slotToUpdate = 'slots';
       } else {
-        suffix = 'AM';
+        slotToUpdate = 'slots_2';
       }
+      
 
-      // Update the specific slot
-      slots[slotID] = {
-        'time': "$time $suffix",
-        'status': 'booked',
-        'bookedBy': user!.email,
-      };
+      if (user != null) {
+        // Get the reference to the station document
+        DocumentReference stationDocRef = _firestore.collection('stations').doc(stationID.toString());
 
-      // Update Firestore with the new slots array
-      await stationDocRef.update({
-        'slots': slots,
-      });
+        // Fetch the current station document
+        DocumentSnapshot stationSnapshot = await stationDocRef.get();
+        Map<String, dynamic> stationData = stationSnapshot.data() as Map<String, dynamic>;
 
-      print('Booking updated successfully in Station Firestore');
-    } else {
-      print('User is not authenticated');
+        // Get the current slots array
+        List<Map<String, dynamic>> slots = List<Map<String, dynamic>>.from(stationData['$slotToUpdate'] as List);
+
+        int time = slotID;
+        String suffix;
+
+        if(slotID == 0){
+          time = time + 12;
+          suffix = 'AM';
+        } else if(slotID > 12){
+          time = time - 12;
+          suffix = 'PM';
+        } else {
+          suffix = 'AM';
+        }
+
+        // Update the specific slot
+        slots[slotID] = {
+          'time': "$time $suffix",
+          'status': 'booked',
+          'bookedBy': user!.email,
+        };
+
+        // Update Firestore with the new slots array
+        await stationDocRef.update({
+          '$slotToUpdate': slots,
+        });
+
+        print('Booking updated successfully in Station Firestore');
+      } else {
+        print('User is not authenticated');
+      }
+    } catch (e) {
+      print('Error updating Booking in Station Firestore: $e');
     }
-  } catch (e) {
-    print('Error updating Booking in Station Firestore: $e');
-  }
+     
 }
 
 

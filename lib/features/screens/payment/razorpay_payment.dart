@@ -9,10 +9,10 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class RazorPayPaymentScreen extends StatefulWidget {
   final int stationID;
-  final int slotID;
+  final int slotID, slotSelected;
   final String slotTime;
 
-  const RazorPayPaymentScreen({super.key, required this.stationID, required this.slotTime, required this.slotID});
+  const RazorPayPaymentScreen({super.key, required this.stationID, required this.slotTime, required this.slotID, required this.slotSelected});
 
   @override
   State<RazorPayPaymentScreen> createState() => _RazorPayPaymentScreenState();
@@ -43,7 +43,7 @@ class _RazorPayPaymentScreenState extends State<RazorPayPaymentScreen> {
     try {
       // update in database
       await DatabaseService().updateUser(widget.stationID, widget.slotTime);
-      await DatabaseService().updateStation(widget.stationID, widget.slotID);
+      await DatabaseService().updateStation(widget.stationID, widget.slotID, widget.slotSelected);
       
 
       Get.offAll(() => const ViewBookingsScreen());
