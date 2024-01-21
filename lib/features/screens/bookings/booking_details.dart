@@ -1,14 +1,18 @@
+import 'package:ev_charging_stations/features/screens/bookslot/bookslot.dart';
+import 'package:ev_charging_stations/features/screens/home/home.dart';
 import 'package:ev_charging_stations/features/screens/map_screen/map_screen.dart';
+import 'package:ev_charging_stations/features/screens/payment/database_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BookingDetailsScreen extends StatelessWidget {
   final String stationName, date, time, stationAddress, latitude, longitude, port;
-  final int stationID;
+  final int stationID,slotID;
 
   const BookingDetailsScreen({
     super.key,
+    required this.slotID,
     required this.stationName,
     required this.date,
     required this.time,
@@ -21,7 +25,7 @@ class BookingDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    printInfo(info: 'port: $port');
+    printInfo(info: 'stationID in bookingDetails: $stationID');
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -275,6 +279,42 @@ class BookingDetailsScreen extends StatelessWidget {
                                   },
                                   child: const Text(
                                     "Get Directions",
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  style: ButtonStyle(
+                                    minimumSize: MaterialStateProperty.all(
+                                        const Size(150, 40)),
+                                    backgroundColor: MaterialStateProperty.all(
+                                        const Color.fromARGB(
+                                            255, 255, 255, 255)),
+                                    textStyle: MaterialStateProperty.all(
+                                        const TextStyle(color: Colors.black)),
+                                  ),
+                                  onPressed: () async{
+                                    int? port_ = int.tryParse(port);
+                                     printInfo(info: 'stationID: $stationID');
+                                     await DatabaseService().moveToUserBookingHistory(stationID,time,port_!,slotID);
+                                     print('stationID - $stationID ; port_ - $port_ ; slotID - $slotID');
+                                     await DatabaseService().freeStationSlot(stationID,port_,slotID);
+                                     
+                                    Get.offAll(HomeScreen());
+                                  },
+                                  child: const Text(
+                                    "CHarging Complete",
                                     style: TextStyle(
                                       color: Colors.blue,
                                       fontSize: 16,
