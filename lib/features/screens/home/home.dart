@@ -17,7 +17,15 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/blob-scene-haikei.png'), // Replace with your image asset path
+            fit: BoxFit.cover,
+          ),
+        ),
+      child:
+        Column(
         children: [
           const SizedBox(
             height: 110,
@@ -60,11 +68,13 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 40,),
+          const SizedBox(height: 100,),
 
-          GridDashboard()
+          GridDashboard(),
+
         ],
       ),
+      )
     );
   }
 }

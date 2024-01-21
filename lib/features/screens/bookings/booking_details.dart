@@ -314,7 +314,7 @@ class BookingDetailsScreen extends StatelessWidget {
                                     Get.offAll(HomeScreen());
                                   },
                                   child: const Text(
-                                    "CHarging Complete",
+                                    "Charging Complete",
                                     style: TextStyle(
                                       color: Colors.blue,
                                       fontSize: 16,

@@ -11,7 +11,7 @@ class ManageVehiclesScreen extends StatefulWidget {
 
 class _ManageVehiclesScreenState extends State<ManageVehiclesScreen> {
   String selectedVehicleType = '2 Wheeler';
-  List<String> addedVehicles = []; // List to store currently added vehicles as strings
+  List<String> addedVehicles = [];
   final TextEditingController _brandController = TextEditingController();
   final TextEditingController _vehicleNameController = TextEditingController();
   final user = FirebaseAuth.instance.currentUser!;
@@ -19,47 +19,39 @@ class _ManageVehiclesScreenState extends State<ManageVehiclesScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch and display the existing vehicles when the screen is initialized
     _fetchVehicles();
   }
 
   Future<void> _fetchVehicles() async {
     try {
-      // Get the reference to the user's document
       DocumentSnapshot userDoc =
           await FirebaseFirestore.instance.collection('users').doc(user.email!).get();
 
-      // Get the 'vehicles' field from the document
       List<dynamic> vehicles = userDoc['vehicles'] ?? [];
 
       setState(() {
-        // Update the addedVehicles list with the fetched vehicles
         addedVehicles = List<String>.from(vehicles.map((vehicle) {
           if (vehicle is Map<String, dynamic> && vehicle.isNotEmpty) {
             return '${vehicle['name']} - ${vehicle['brand']} (${vehicle['type']})';
           } else {
-            return ''; // Replace with your default value or handle the case as needed
+            return '';
           }
         }));
       });
     } catch (e) {
       print('Error fetching vehicles from Firestore: $e');
-      // Handle the error as needed
     }
   }
 
   Future<void> _addVehicle() async {
     try {
-      // Get the reference to the user's document
       DocumentReference userDocRef =
           FirebaseFirestore.instance.collection('users').doc(user.email!);
 
-      // Get the currently entered vehicle details
       String vehicleName = _vehicleNameController.text;
       String brand = _brandController.text;
       String selectedType = selectedVehicleType;
 
-      // Update Firestore with the new vehicle
       await userDocRef.update({
         'vehicles': FieldValue.arrayUnion([
           {
@@ -70,59 +62,46 @@ class _ManageVehiclesScreenState extends State<ManageVehiclesScreen> {
         ]),
       });
 
-      // Clear the text fields after adding the vehicle
       _vehicleNameController.clear();
       _brandController.clear();
 
-      // Fetch and display the updated list of vehicles
       await _fetchVehicles();
 
       print('Vehicle updated successfully in Firestore');
     } catch (e) {
       print('Error updating vehicle in Firestore: $e');
-      // Handle the error as needed
     }
   }
 
-void _deleteVehicle(String vehicle) {
-  int index = addedVehicles.indexOf(vehicle);
-  if (index != -1) {
-    setState(() {
-      addedVehicles.removeAt(index);
-    });
-    // Now you can also update Firestore to remove the deleted vehicle if needed
-    _updateFirestoreAfterDelete(index);
+  void _deleteVehicle(String vehicle) {
+    int index = addedVehicles.indexOf(vehicle);
+    if (index != -1) {
+      setState(() {
+        addedVehicles.removeAt(index);
+      });
+      _updateFirestoreAfterDelete(index);
+    }
   }
-}
 
-Future<void> _updateFirestoreAfterDelete(int deletedIndex) async {
-  try {
-    // Get the reference to the user's document
-    DocumentReference userDocRef =
-        FirebaseFirestore.instance.collection('users').doc(user.email!);
+  Future<void> _updateFirestoreAfterDelete(int deletedIndex) async {
+    try {
+      DocumentReference userDocRef =
+          FirebaseFirestore.instance.collection('users').doc(user.email!);
 
-    // Fetch the current list of vehicles
-    DocumentSnapshot<Object?> userDoc = await userDocRef.get();
-    
-    // Cast to the correct type
-    Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>? ?? {};
-    List<dynamic> currentVehicles = data['vehicles'] ?? [];
+      DocumentSnapshot<Object?> userDoc = await userDocRef.get();
 
-    // Remove the deleted vehicle from Firestore
-    currentVehicles.removeAt(deletedIndex);
+      Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>? ?? {};
+      List<dynamic> currentVehicles = data['vehicles'] ?? [];
 
-    // Update Firestore with the modified list
-    await userDocRef.update({'vehicles': currentVehicles});
+      currentVehicles.removeAt(deletedIndex);
 
-    print('Vehicle deleted successfully in Firestore');
-  } catch (e) {
-    print('Error deleting vehicle in Firestore: $e');
-    // Handle the error as needed
+      await userDocRef.update({'vehicles': currentVehicles});
+
+      print('Vehicle deleted successfully in Firestore');
+    } catch (e) {
+      print('Error deleting vehicle in Firestore: $e');
+    }
   }
-}
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +116,7 @@ Future<void> _updateFirestoreAfterDelete(int deletedIndex) async {
             Navigator.pop(context);
           },
         ),
-        title: const Text("Manage Vehicles", style: TextStyle(color: Colors.white),),
+        title: const Text("Manage Vehicles", style: TextStyle(color: Colors.white)),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -183,7 +162,7 @@ Future<void> _updateFirestoreAfterDelete(int deletedIndex) async {
               const Divider(
                 color: Color.fromARGB(255, 0, 0, 0),
                 thickness: 1,
-              ), // Divider after "Add Vehicle" button
+              ),
               const SizedBox(height: 16),
               const Text(
                 "Currently Added Vehicles",
@@ -194,7 +173,7 @@ Future<void> _updateFirestoreAfterDelete(int deletedIndex) async {
                 ),
               ),
               const SizedBox(height: 16),
-              ..._buildAddedVehiclesList(), // List of currently added vehicles
+              ..._buildAddedVehiclesList(),
             ],
           ),
         ),
@@ -240,7 +219,6 @@ Future<void> _updateFirestoreAfterDelete(int deletedIndex) async {
             selectedVehicleType = value!;
           });
         },
-        // You can set an initial value if needed
         value: '2 Wheeler',
       ),
     );
@@ -250,19 +228,56 @@ Future<void> _updateFirestoreAfterDelete(int deletedIndex) async {
     return vehicleType == '2 Wheeler' ? Icons.motorcycle : Icons.directions_car;
   }
 
-  List<ListTile> _buildAddedVehiclesList() {
-    return addedVehicles.map((vehicle) => ListTile(
-      title: Text(vehicle),
-      trailing: IconButton(
-        icon: const Icon(Icons.delete),
-        onPressed: () {
-          _deleteVehicle(vehicle);
-          print(vehicle);
-        },
-      ),
-    )).toList();
-  }
+  // List<ListTile> _buildAddedVehiclesList() {
+  //   return addedVehicles.map((vehicle) => ListTile(
+  //     tileColor: Colors.blueGrey[50],
+  //     title: Text(
+  //       vehicle,
+  //       style: const TextStyle(
+  //         fontSize: 18,
+  //         fontWeight: FontWeight.bold,
+  //         color: Colors.black,
+  //       ),
+  //     ),
+  //     trailing: IconButton(
+  //       icon: const Icon(Icons.delete),
+  //       onPressed: () {
+  //         _deleteVehicle(vehicle);
+  //         print(vehicle);
+  //       },
+  //     ),
+  //   )).toList();
+  // }
 
-  
+  List<Widget> _buildAddedVehiclesList() {
+  return addedVehicles.asMap().entries.map((entry) {
+    int index = entry.key;
+    String vehicle = entry.value;
+
+    return Column(
+      children: [
+        ListTile(
+          tileColor: Colors.blueGrey[50],
+          title: Text(
+            vehicle,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          trailing: IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () {
+              _deleteVehicle(vehicle);
+              print(vehicle);
+            },
+          ),
+        ),
+        if (index != addedVehicles.length - 1) SizedBox(height: 5), // Add a gap of 5 except for the last item
+      ],
+    );
+  }).toList();
+}
 
 }
