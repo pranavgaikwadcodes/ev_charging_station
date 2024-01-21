@@ -42,7 +42,7 @@ class _RazorPayPaymentScreenState extends State<RazorPayPaymentScreen> {
 
     try {
       // update in database
-      await DatabaseService().updateUser(widget.stationID, widget.slotTime);
+      await DatabaseService().updateUser(widget.stationID, widget.slotTime, widget.slotSelected);
       await DatabaseService().updateStation(widget.stationID, widget.slotID, widget.slotSelected);
       
 

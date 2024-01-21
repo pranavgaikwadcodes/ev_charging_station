@@ -7,7 +7,7 @@ class DatabaseService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final User? user = FirebaseAuth.instance.currentUser;
 
-  Future<void> updateUser(int stationID, String slotTime) async {
+  Future<void> updateUser(int stationID, String slotTime, int slotSelected) async {
     try {
       if (user != null) {
         // Get the reference to the user's document
@@ -25,6 +25,7 @@ class DatabaseService {
               'stationID': stationID0,
               'time': time,
               'date': date,
+              'port': slotSelected,
             }
           ]),
         });

@@ -52,7 +52,7 @@ class ViewBookingsScreen extends StatelessWidget {
                   future: fetchUserBookings(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
+                      return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else {
@@ -79,6 +79,7 @@ class ViewBookingsScreen extends StatelessWidget {
                               stationName: booking.stationName,
                               date: booking.date,
                               time: booking.time,
+                              port: booking.port,
                               stationAddress: booking.stationAddress,
                               lat: booking.latitude,
                               long: booking.longitude,
@@ -138,8 +139,9 @@ class ViewBookingsScreen extends StatelessWidget {
             latitude: double.tryParse(stationSnapshot['latitude']?.toString() ?? '') ?? 0.0,
             longitude: double.tryParse(stationSnapshot['longitude']?.toString() ?? '') ?? 0.0,
             stationAddress: stationSnapshot.data()?['address'] ?? 'Unknown Address',
-
+            port: bookingData['port'].toString(),
           );
+          printInfo(info: 'booking data : $booking');
           
           printInfo(info: "LAT LONG : ${stationSnapshot['latitude']}, ${stationSnapshot['longitude']}");
           bookings.add(booking);
@@ -163,6 +165,7 @@ class BookingData {
   final String stationName;
   final String date;
   final String time;
+  final String port;
   final String stationAddress;
   final double latitude;
   final double longitude;
@@ -171,6 +174,7 @@ class BookingData {
     required this.stationName,
     required this.date,
     required this.time,
+    required this.port,
     required this.stationAddress, 
     required this.latitude,
     required this.longitude,
@@ -183,6 +187,7 @@ class BookingCard extends StatelessWidget {
     required this.stationName,
     required this.date,
     required this.time,
+    required this.port,
     required this.stationAddress,
     required this.lat,
     required this.long,
@@ -191,12 +196,16 @@ class BookingCard extends StatelessWidget {
   final String stationName;
   final String date;
   final String time;
+  final String port;
   final String stationAddress;
   final double lat;
   final double long;
 
   @override
   Widget build(BuildContext context) {
+    
+    printInfo(info: 'portInfo: $port');
+
     return Card(
       elevation: 5,
       shadowColor: const Color.fromARGB(255, 34, 34, 34),
@@ -278,6 +287,7 @@ class BookingCard extends StatelessWidget {
                             stationName: stationName,
                             date: date,
                             time: time,
+                            port: port,
                             stationAddress: stationAddress,
                             latitude: lat.toString(),
                             longitude: long.toString(),

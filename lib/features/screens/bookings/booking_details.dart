@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BookingDetailsScreen extends StatelessWidget {
-  final String stationName, date, time, stationAddress, latitude, longitude;
+  final String stationName, date, time, stationAddress, latitude, longitude, port;
   final int stationID;
 
   const BookingDetailsScreen({
@@ -12,6 +12,7 @@ class BookingDetailsScreen extends StatelessWidget {
     required this.stationName,
     required this.date,
     required this.time,
+    required this.port,
     required this.stationAddress,
     required this.stationID,
     required this.latitude,
@@ -20,6 +21,7 @@ class BookingDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    printInfo(info: 'port: $port');
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -55,47 +57,28 @@ class BookingDetailsScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(15),
                       child: SizedBox(
                         width: double.infinity,
-                        height: 190,
+                        height: 200,
                         child: Image.asset(
                           'assets/evAPP.jpeg',
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
-                    // Column(
-                    //   children: [
-                        Align(
-                          alignment: Alignment.center,
-                          child: ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              topRight: Radius.circular(15),
-                            ),
-                            child: Container(
-                              color: const Color.fromRGBO(255, 255, 255, 1)
-                                  .withOpacity(0.8),
-                              width: 371.4,
-                              height: 120,
-                            ),
-                          ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(15),
+                          topRight: Radius.circular(15),
                         ),
-                        // Align(
-                        //   alignment: Alignment.center,
-                        //   child: ClipRRect(
-                        //     borderRadius: const BorderRadius.only(
-                        //       bottomLeft: Radius.circular(15),
-                        //       bottomRight: Radius.circular(15),
-                        //     ),
-                        //     child: Container(
-                        //       color: const Color.fromRGBO(0, 0, 0, 1)
-                        //           .withOpacity(0.4),
-                        //       width: 371.4,
-                        //       height: 70,
-                        //     ),
-                        //   ),
-                        // ),
-                    //   ],
-                    // ),
+                        child: Container(
+                          color: const Color.fromRGBO(255, 255, 255, 1)
+                              .withOpacity(0.8),
+                          width: 371.4,
+                          height: 145,
+                        ),
+                      ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -109,14 +92,19 @@ class BookingDetailsScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          Text(
-                            'Name: $stationName\nAddress: $stationAddress',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                          SizedBox(
+                            height: 70,
+                            child: Text(
+                              'Name: $stationName\nAddress: $stationAddress',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 15),
                           const Row(
                             children: [
                               Text(
@@ -124,18 +112,74 @@ class BookingDetailsScreen extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white
+                                  color: Colors.white,
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.black,
+                                      offset: Offset(-2, 2),
+                                      blurRadius: 5,
+                                    ),
+                                  ],
                                 ),
                               ),
-                              SizedBox(width: 8),
+                              SizedBox(width: 20),
                               Row(
                                 children: [
-                                  Icon(Icons.star, color: Colors.yellow),
-                                  Icon(Icons.star, color: Colors.yellow),
-                                  Icon(Icons.star, color: Colors.yellow),
-                                  Icon(Icons.star_half, color: Colors.yellow),
-                                  Icon(Icons.star_outline,
-                                      color: Colors.yellow),
+                                  Icon(
+                                    Icons.star,
+                                    color: Colors.yellow,
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black,
+                                        offset: Offset(-2, 2),
+                                        blurRadius: 25,
+                                      ),
+                                    ],
+                                  ),
+                                  Icon(
+                                    Icons.star,
+                                    color: Colors.yellow,
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black,
+                                        offset: Offset(-2, 2),
+                                        blurRadius: 25,
+                                      ),
+                                    ],
+                                  ),
+                                  Icon(
+                                    Icons.star,
+                                    color: Colors.yellow,
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black,
+                                        offset: Offset(-2, 2),
+                                        blurRadius: 25,
+                                      ),
+                                    ],
+                                  ),
+                                  Icon(
+                                    Icons.star_half,
+                                    color: Colors.yellow,
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black,
+                                        offset: Offset(-2, 2),
+                                        blurRadius: 25,
+                                      ),
+                                    ],
+                                  ),
+                                  Icon(
+                                    Icons.star_outline,
+                                    color: Colors.yellow,
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black,
+                                        offset: Offset(-2, 2),
+                                        blurRadius: 25,
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
                             ],
@@ -202,9 +246,9 @@ class BookingDetailsScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          const Text(
-                            "Paid ✅",
-                            style: TextStyle(
+                          Text(
+                            'Paid ✅, PORT: $port',
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
@@ -221,7 +265,8 @@ class BookingDetailsScreen extends StatelessWidget {
                                     minimumSize: MaterialStateProperty.all(
                                         const Size(150, 40)),
                                     backgroundColor: MaterialStateProperty.all(
-                                        const Color.fromARGB(255, 255, 255, 255)),
+                                        const Color.fromARGB(
+                                            255, 255, 255, 255)),
                                     textStyle: MaterialStateProperty.all(
                                         const TextStyle(color: Colors.black)),
                                   ),
