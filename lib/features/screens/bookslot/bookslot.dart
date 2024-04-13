@@ -3,6 +3,7 @@ import 'package:ev_charging_stations/features/screens/map_screen/map_screen.dart
 import 'package:ev_charging_stations/features/screens/payment/razorpay_payment.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:core';
 
 import '../../station/station.dart';
 
@@ -17,6 +18,11 @@ class BookSlot extends StatefulWidget {
 
   @override
   State<BookSlot> createState() => _BookSlotState();
+}
+
+// Add a method to get the current time
+DateTime getCurrentTime() {
+  return DateTime.now();
 }
 
 class _BookSlotState extends State<BookSlot> {
@@ -206,7 +212,7 @@ class _BookSlotState extends State<BookSlot> {
                         ),
                       ),
                     ),
-                    
+
                     const Text("Port 1"),
 
                     const SizedBox(
@@ -231,7 +237,9 @@ class _BookSlotState extends State<BookSlot> {
                             const Color.fromARGB(255, 0, 80, 4) ??
                                 const Color.fromARGB(255, 0, 170, 14);
                         Color cardColor = selectedSlots.contains(index)
-                            ? ((slotClickedID == 1) ? selectedColor : defaultColor)
+                            ? ((slotClickedID == 1)
+                                ? selectedColor
+                                : defaultColor)
                             : (status == 'booked'
                                 ? Colors.orange
                                 : defaultColor);
@@ -242,6 +250,19 @@ class _BookSlotState extends State<BookSlot> {
                             String status = slot.containsKey('status')
                                 ? slot['status']
                                 : '';
+
+                            DateTime currentTime =
+                                DateTime.now(); // Get current time
+                            
+                            // Convert slot time string to DateTime
+                            DateTime selectedSlotTime =
+                                convertTimeStringToDateTime(slot['time']);
+                            printError(info: "This is where error is bro");
+                            // Check if slot time is in the past
+                            if (selectedSlotTime.isBefore(currentTime)) {
+                              showToast('Cannot select past slots');
+                              return;
+                            }
 
                             // Check if the slot is booked
                             if (status == 'booked') {
@@ -292,8 +313,7 @@ class _BookSlotState extends State<BookSlot> {
                     ),
 
                     // if station slot_2 is not present dont show this section
-                    if(station.slots_2.isNotEmpty)
-                      const Text("Port 2"),
+                    if (station.slots_2.isNotEmpty) const Text("Port 2"),
 
                     // slot section 2
                     const SizedBox(
@@ -318,7 +338,9 @@ class _BookSlotState extends State<BookSlot> {
                         Color selectedColor =
                             const Color.fromARGB(255, 0, 80, 4);
                         Color cardColor = selectedSlots.contains(index2)
-                            ? ((slotClickedID == 2) ? selectedColor : defaultColor)
+                            ? ((slotClickedID == 2)
+                                ? selectedColor
+                                : defaultColor)
                             : (status == 'booked'
                                 ? Colors.orange
                                 : defaultColor);
@@ -329,6 +351,18 @@ class _BookSlotState extends State<BookSlot> {
                             String status = slot2.containsKey('status')
                                 ? slot2['status']
                                 : '';
+
+                            DateTime currentTime = DateTime.now(); // Get current time
+                            
+                            // Convert slot time string to DateTime
+                            DateTime selectedSlotTime =
+                                convertTimeStringToDateTime(slot2['time']);
+                            printError(info: "This is where error is bro");
+                            // Check if slot time is in the past
+                            if (selectedSlotTime.isBefore(currentTime)) {
+                              showToast('Cannot select past slots');
+                              return;
+                            }
 
                             if (status == 'booked') {
                               // Show a toast message indicating that the slot is already booked
@@ -438,21 +472,23 @@ class _BookSlotState extends State<BookSlot> {
                     ),
 
                     ElevatedButton(
-                      onPressed: selectedSlots.isNotEmpty || selectedSlots2.isNotEmpty
-                          ? () {
-                              // Handle the Confirm and Pay action
-                              Get.offAll(() => RazorPayPaymentScreen(
-                                  stationID: widget.stationID,
-                                  slotTime: slotTime,
-                                  slotID: slotID,
-                                  slotSelected: slotClickedID));
-                            }
-                          : () {
-                              // Show a toast message indicating that a slot should be selected
-                              showToast('Please select a slot first');
-                            },
+                      onPressed:
+                          selectedSlots.isNotEmpty || selectedSlots2.isNotEmpty
+                              ? () {
+                                  // Handle the Confirm and Pay action
+                                  Get.offAll(() => RazorPayPaymentScreen(
+                                      stationID: widget.stationID,
+                                      slotTime: slotTime,
+                                      slotID: slotID,
+                                      slotSelected: slotClickedID));
+                                }
+                              : () {
+                                  // Show a toast message indicating that a slot should be selected
+                                  showToast('Please select a slot first');
+                                },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: selectedSlots.isNotEmpty || selectedSlots2.isNotEmpty
+                        backgroundColor: selectedSlots.isNotEmpty ||
+                                selectedSlots2.isNotEmpty
                             ? const Color.fromARGB(255, 22, 22, 22)
                             : const Color.fromARGB(
                                 255, 56, 56, 56), // Disabled color
@@ -514,4 +550,35 @@ class _BookSlotState extends State<BookSlot> {
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
+
+
+  DateTime convertTimeStringToDateTime(String timeString) {
+    // Split the timeString into hours, minutes, and period (AM/PM)
+    List<String> parts = timeString.split(' ');
+    if (parts.length != 2) {
+      throw ArgumentError("Invalid time format: $timeString");
+    }
+
+    // Extract hours, minutes, and period (AM/PM)
+    int hours = int.parse(parts[0]);
+    String period = parts[1].toUpperCase();
+
+    // Check if hours and period are within valid ranges
+    if ((hours < 1 || hours > 12) ||
+        (period != 'AM' && period != 'PM')) {
+      throw ArgumentError("Invalid time format: $timeString");
+    }
+
+    // Adjust hours if necessary
+    if (period == 'PM' && hours < 12) {
+      hours += 12;
+    } else if (period == 'AM' && hours == 12) {
+      hours = 0;
+    }
+
+    // Create a DateTime object with today's date and the parsed time
+    DateTime now = DateTime.now();
+    return DateTime(now.year, now.month, now.day, hours, 0);
+  }
+
 }
