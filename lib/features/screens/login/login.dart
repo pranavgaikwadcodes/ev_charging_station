@@ -2,6 +2,7 @@ import 'package:ev_charging_stations/features/controller/AuthController.dart';
 import 'package:ev_charging_stations/features/screens/home/home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:ev_charging_stations/features/screens/signup/signup.dart';
 
@@ -47,7 +48,16 @@ class LoginController extends GetxController {
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
-
+      // Show toast message
+      Fluttertoast.showToast(
+        msg: "You are now Logged In",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
       Get.offAll(() => HomeScreen());
       print("Logged in");
     } catch (e) {

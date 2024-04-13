@@ -50,7 +50,17 @@ class _RazorPayPaymentScreenState extends State<RazorPayPaymentScreen> {
 
       Fluttertoast.showToast(
           msg: "Payment Successful ${response.paymentId!}",
-          toastLength: Toast.LENGTH_LONG);
+          toastLength: Toast.LENGTH_SHORT);
+            
+      Fluttertoast.showToast(
+        msg: "Booking Congfirmed!\nYour Slot Was Booked",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
 
     } catch (e) {
       print('Error : $e');

@@ -16,6 +16,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   late TextEditingController nameController;
   late TextEditingController mobileController;
   late TextEditingController ageController;
+  late TextEditingController vehicleRegistrationPlate;
 
   @override
   void initState() {
@@ -24,6 +25,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     nameController = TextEditingController();
     mobileController = TextEditingController();
     ageController = TextEditingController();
+    vehicleRegistrationPlate = TextEditingController();
 
     // Fetch user data from Firestore
     fetchUserData();
@@ -40,6 +42,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         nameController.text = userData['name'] ?? '';
         mobileController.text = userData['mobile'] ?? '';
         ageController.text = userData['age'] ?? '';
+        vehicleRegistrationPlate.text = userData['vehicleRegistrationPlateNumber'] ?? '';
 
         // Print the user data for debugging purposes
         print("User Data: $userData");
@@ -112,6 +115,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     buildProfileTextField("Name", Icons.person, nameController),
                     buildProfileTextField("Mobile", Icons.call, mobileController),
                     buildProfileTextField("Age", Icons.handshake, ageController),
+                    buildProfileTextField("vehicle Registration Plate", Icons.handshake, vehicleRegistrationPlate),
                     const SizedBox(height: 24),
                     SizedBox(
                       height: 50,

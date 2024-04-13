@@ -12,6 +12,7 @@ class AuthController extends GetxController {
 
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+  TextEditingController vehicleRegistrationPlateNumberController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
   final auth = FirebaseAuth.instance;
@@ -42,9 +43,20 @@ class AuthController extends GetxController {
       await _db.collection("users").doc(emailController.text.trim()).set({
         "email": emailController.text.trim(),
         "name": nameController.text.trim(),
+        "vehicleRegistrationPlateNumber": vehicleRegistrationPlateNumberController.text.trim(),
       });
 
       isLoading.value = false;
+      // Show toast message
+      Fluttertoast.showToast(
+        msg: "Registration successful, Logging you in...",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
 
       Get.to(() => HomeScreen());
     } on FirebaseAuthException catch (e) {
@@ -150,6 +162,21 @@ class SignupScreen extends StatelessWidget {
                                 fillColor: Colors.white,
                                 labelText: "Email",
                                 prefixIcon: const Icon(Icons.mail_rounded),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            // Number Plate
+                            TextFormField(
+                              controller: authController.vehicleRegistrationPlateNumberController,
+                              style: const TextStyle(color: Colors.black),
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white,
+                                labelText: "Vehicle registration plate number",
+                                prefixIcon: const Icon(Icons.confirmation_number),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
