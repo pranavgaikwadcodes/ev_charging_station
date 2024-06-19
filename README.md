@@ -14,15 +14,40 @@ Key features of the app include:
 - **Slot Pre-Booking:** Allows users to reserve charging slots in advance, optimizing their charging experience.
 - **Integrated Payment Gateway:** Facilitates secure and seamless transactions directly within the app.
 
-## Screenshots
+## Project Screenshots
 
-![Screenshot 1](Screenshots/screenshot1.png)
-*Caption for screenshot 1.*
+Here are some screenshots of the application:
+<!-- 
+![Screenshot 1](screenshots/1.PNG)
+![Screenshot 2](screenshots/2.PNG)
+![Screenshot 3](screenshots/3.PNG)
+![Screenshot 4](screenshots/4.PNG)
+![Screenshot 5](screenshots/20.PNG)
+![Screenshot 5](screenshots/31.PNG)
+![Screenshot 5](screenshots/36.PNG) -->
 
-![Screenshot 2](Screenshots/screenshot2.png)
-*Caption for screenshot 2.*
+<table>
+  <tr>
+    <td><img src="ScreenShots/1.PNG" alt="Screenshot 1" width="400"></td>
+    <td><img src="ScreenShots/2.PNG" alt="Screenshot 2" width="400"></td>
+  </tr>
+  <tr>
+    <td><img src="ScreenShots/3.PNG" alt="Screenshot 3" width="400"></td>
+    <td><img src="ScreenShots/4.PNG" alt="Screenshot 4" width="400"></td>
+  </tr>
+  <tr>
+    <td><img src="ScreenShots/20.PNG" alt="Screenshot 5" width="400"></td>
+    <td><img src="ScreenShots/31.PNG" alt="Screenshot 6" width="400"></td>
+  </tr>
+  <tr>
+    <td><img src="ScreenShots/8.PNG" alt="Screenshot 7" width="400"></td>
+    <td><img src="ScreenShots/36.PNG" alt="Screenshot 8" width="400"></td>
+  </tr>
+</table>
 
-<!-- Add more screenshots as needed -->
+For more screenshots, visit the [screenshots folder](ScreenShots/README.md).
+
+
 
 ## Installation
 
