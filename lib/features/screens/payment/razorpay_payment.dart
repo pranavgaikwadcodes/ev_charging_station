@@ -25,7 +25,9 @@ class _RazorPayPaymentScreenState extends State<RazorPayPaymentScreen> {
   void openCheckout(amount) async {
     amount = amount * 100;
     var options = {
-      'key': 'rzp_test_YViNItgZr6irqs',
+      // 'key': 'rzp_test_YViNItgZr6irqs',
+      // 'key': 'rzp_test_FoEhUHodBwBdY1',
+      'key': 'rzp_test_WbAxTov9hC5RKF',
       'amount': amount,
       'name': 'EV Station',
       'prefill': {'email': user.email},
