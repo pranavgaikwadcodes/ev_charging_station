@@ -28,20 +28,20 @@ Here are some screenshots of the application:
 
 <table>
   <tr>
-    <td><img src="ScreenShots/1.PNG" alt="Screenshot 1" width="400"></td>
-    <td><img src="ScreenShots/2.PNG" alt="Screenshot 2" width="400"></td>
+    <td><img src="ScreenShots/1.png" alt="Screenshot 1" width="400"></td>
+    <td><img src="ScreenShots/2.png" alt="Screenshot 2" width="400"></td>
   </tr>
   <tr>
-    <td><img src="ScreenShots/3.PNG" alt="Screenshot 3" width="400"></td>
-    <td><img src="ScreenShots/4.PNG" alt="Screenshot 4" width="400"></td>
+    <td><img src="ScreenShots/3.png" alt="Screenshot 3" width="400"></td>
+    <td><img src="ScreenShots/4.png" alt="Screenshot 4" width="400"></td>
   </tr>
   <tr>
-    <td><img src="ScreenShots/20.PNG" alt="Screenshot 5" width="400"></td>
-    <td><img src="ScreenShots/31.PNG" alt="Screenshot 6" width="400"></td>
+    <td><img src="ScreenShots/5.png" alt="Screenshot 5" width="400"></td>
+    <td><img src="ScreenShots/6.png" alt="Screenshot 6" width="400"></td>
   </tr>
   <tr>
-    <td><img src="ScreenShots/8.PNG" alt="Screenshot 7" width="400"></td>
-    <td><img src="ScreenShots/36.PNG" alt="Screenshot 8" width="400"></td>
+    <td><img src="ScreenShots/12.png" alt="Screenshot 7" width="400"></td>
+    <td><img src="ScreenShots/9.png" alt="Screenshot 8" width="400"></td>
   </tr>
 </table>
 
