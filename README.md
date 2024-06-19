@@ -1,7 +1,5 @@
 # EV Charging Station Locator App
 
-![App Icon](url_to_your_app_icon)
-
 ## Description
 
 The EV Charging Station Locator App is a cross-platform mobile application developed using Flutter. It enables electric vehicle owners to conveniently find nearby charging stations, check their availability, status, and even pre-book slots for charging. The app includes a payment gateway for seamless transactions, offering enhanced convenience and engagement for users.
