@@ -33,3 +33,31 @@ git clone https://github.com/pranavgaikwadcodes/ev_charging_station.git
 
 2. Navigate into the project directory:
 `cd ev_charging_station`
+
+3. Install dependencies:
+`flutter pub get`
+
+4. Run the app:
+`flutter run`
+
+
+## Contributing
+
+Contributions are welcome! If you find any issues or have suggestions for improvement, please open an issue or a pull request in this repository.
+
+## License
+
+This project is licensed under the [License Name, e.g., MIT License]. See the LICENSE file for details.
+
+<!-- Replace License Name with the appropriate license for your project -->
+
+## Acknowledgements
+
+- Mention any libraries, frameworks, or third-party assets used in your project.
+
+## Contact
+
+- Your Name
+- Contact Information
+- Additional links or contact information as needed
+
