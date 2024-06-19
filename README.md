@@ -18,13 +18,13 @@ Key features of the app include:
 
 Here are some screenshots of the application:
 <!-- 
-![Screenshot 1](screenshots/1.PNG)
-![Screenshot 2](screenshots/2.PNG)
-![Screenshot 3](screenshots/3.PNG)
-![Screenshot 4](screenshots/4.PNG)
-![Screenshot 5](screenshots/20.PNG)
-![Screenshot 5](screenshots/31.PNG)
-![Screenshot 5](screenshots/36.PNG) -->
+![Screenshot 1](screenshots/1.png)
+![Screenshot 2](screenshots/2.png)
+![Screenshot 3](screenshots/3.png)
+![Screenshot 4](screenshots/4.png)
+![Screenshot 5](screenshots/20.png)
+![Screenshot 5](screenshots/31.png)
+![Screenshot 5](screenshots/36.png) -->
 
 <table>
   <tr>
@@ -45,7 +45,7 @@ Here are some screenshots of the application:
   </tr>
 </table>
 
-For more screenshots, visit the [screenshots folder](ScreenShots/README.md).
+For more screenshots, visit the [screenshots folder](ScreenShots/).
 
 
 
